@@ -1,0 +1,771 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Cut Block v9</title>
+<meta name="theme-color" content="#F6F5F2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1113" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Cut v9">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: phone-first single column, 16px gutter, bottom tab bar in the thumb zone; logging is a full-screen mode. */
+:root{
+  --bg:#F6F5F2;--surface:#FFFFFF;--surface-2:#EFEDE8;--text:#1B1D21;--text-2:#5B6068;
+  --line:#DAD7CF;--line-strong:#8E8A80;--accent:#0F6E5C;--accent-ink:#FFFFFF;
+  --ok:#1B7F3B;--warn:#9A4A07;--danger:#B42318;--info:#2457A6;--band:rgba(15,110,92,.14);
+  --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Barlow",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  --r-card:14px;--r-ctl:12px;--tab-h:64px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1113;--surface:#1A1D21;--surface-2:#23272C;--text:#ECEBE7;--text-2:#A3A8B0;
+  --line:#30353B;--line-strong:#6B7178;--accent:#4FD1B5;--accent-ink:#06251F;
+  --ok:#5FD38A;--warn:#F5A524;--danger:#FF7B72;--info:#7AA7FF;--band:rgba(79,209,181,.18);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1113;--surface:#1A1D21;--surface-2:#23272C;--text:#ECEBE7;--text-2:#A3A8B0;
+  --line:#30353B;--line-strong:#6B7178;--accent:#4FD1B5;--accent-ink:#06251F;
+  --ok:#5FD38A;--warn:#F5A524;--danger:#FF7B72;--info:#7AA7FF;--band:rgba(79,209,181,.18);color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--f-body);font-size:16px;line-height:1.4;-webkit-text-size-adjust:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+main{max-width:560px;margin:0 auto;padding-inline:16px;padding-block:12px calc(var(--tab-h) + 28px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{margin:0;text-wrap:balance}
+h1{font-family:var(--f-display);font-size:30px;line-height:1.05;letter-spacing:.01em}
+h2{font-family:var(--f-display);font-size:22px;letter-spacing:.02em}
+h3{font-size:15px;font-weight:600}
+p{margin:0}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--text-2)}
+.muted{color:var(--text-2)}
+.small{font-size:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.between{justify-content:space-between}
+.grow{flex:1;min-width:0}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:4px 9px;border-radius:999px;border:1.5px solid currentColor;line-height:1}
+.pill.cut{color:var(--accent)}.pill.deload{color:var(--info)}.pill.diet_break{color:var(--warn)}.pill.fallback{color:var(--warn)}.pill.pre{color:var(--text-2)}
+.btn{min-height:48px;border-radius:var(--r-ctl);border:1.5px solid var(--line-strong);background:var(--surface);padding:0 16px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);min-height:56px;font-size:18px}
+.btn.big{min-height:64px;font-size:20px;font-family:var(--f-display);letter-spacing:.04em;text-transform:uppercase;width:100%}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--accent)}
+.btn.sm{min-height:40px;padding:0 12px;font-size:14px}
+.btn:disabled{opacity:.45}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label{font-size:13px;font-weight:600;color:var(--text-2)}
+.field input,.field select,.field textarea{min-height:48px;border-radius:var(--r-ctl);border:1.5px solid var(--line-strong);background:var(--surface);padding:0 12px;font-size:17px;width:100%}
+.field textarea{padding:10px 12px;min-height:72px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.kpi{display:flex;flex-direction:column;gap:2px;padding:12px;border-radius:12px;background:var(--surface-2);min-width:0}
+.kpi .v{font-family:var(--f-display);font-size:28px;line-height:1.05;font-variant-numeric:tabular-nums}
+.kpi .l{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-2)}
+.kpi .d{font-size:13px;color:var(--text-2)}
+.banner{border-radius:12px;padding:12px 14px;border:1.5px solid var(--warn);display:flex;flex-direction:column;gap:10px}
+.banner.info{border-color:var(--info)}.banner.ok{border-color:var(--ok)}.banner.danger{border-color:var(--danger)}
+.status{font-weight:700;font-size:13px;letter-spacing:.05em;text-transform:uppercase}
+.s-ok{color:var(--ok)}.s-warn{color:var(--warn)}.s-danger{color:var(--danger)}.s-info{color:var(--info)}
+/* tab bar */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:env(safe-area-inset-bottom,0px);z-index:20}
+nav.tabs button{height:var(--tab-h);border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:13px;font-weight:600;color:var(--text-2);position:relative}
+nav.tabs button svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav.tabs button[aria-current="page"]{color:var(--accent)}
+nav.tabs .dot{position:absolute;top:10px;right:calc(50% - 18px);width:8px;height:8px;border-radius:50%;background:var(--warn)}
+body.logging nav.tabs{display:none}
+/* week dots */
+.dots{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.dots div{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:var(--text-2);font-weight:600}
+.dots span{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--line-strong);display:grid;place-items:center;font-size:11px;color:var(--text)}
+.dots .done span{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.dots .miss span{border-color:var(--warn);color:var(--warn)}
+.dots .today span{outline:2px solid var(--accent);outline-offset:2px}
+.dots .rest span{border-style:dashed}
+/* logger */
+.logtop{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--bg);padding-block:8px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line);margin-inline:-16px;padding-inline:16px}
+.strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;margin-inline:-16px;padding-inline:16px}
+.strip::-webkit-scrollbar{display:none}
+.chip{flex:none;min-height:40px;padding:0 12px;border-radius:999px;border:1.5px solid var(--line-strong);background:var(--surface);font-size:14px;font-weight:600;white-space:nowrap}
+.chip.done{background:var(--surface-2);color:var(--text-2);border-color:var(--line)}
+.chip.active{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.chip.skipped{text-decoration:line-through;color:var(--text-2)}
+.stepper{display:grid;grid-template-columns:56px 1fr 56px;align-items:center;gap:8px}
+.stepper button{height:56px;border-radius:var(--r-ctl);border:1.5px solid var(--line-strong);background:var(--surface-2);font-size:28px;font-weight:600;line-height:1}
+.stepper input{height:56px;border:0;background:transparent;text-align:center;font-family:var(--f-display);font-size:40px;font-weight:700;width:100%;font-variant-numeric:tabular-nums}
+.stepper .unit{font-size:13px;color:var(--text-2);text-align:center;grid-column:1/-1;margin-top:-6px}
+.rir{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.rir button{height:52px;border-radius:var(--r-ctl);border:1.5px solid var(--line-strong);background:var(--surface);font-weight:700;font-size:18px}
+.rir button.target{border-style:dashed;border-color:var(--accent)}
+.rir button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);border-style:solid}
+.setrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+.setrow .n{width:44px;color:var(--text-2);font-size:14px;font-weight:600}
+.setrow .x{margin-left:auto;min-height:36px;min-width:36px;border:0;background:none;color:var(--text-2);font-size:20px}
+.dock{position:sticky;bottom:calc(env(safe-area-inset-bottom,0px) + 8px);display:flex;flex-direction:column;gap:8px;z-index:5}
+.timer{display:flex;align-items:center;gap:10px;background:var(--surface);border:1.5px solid var(--line-strong);border-radius:var(--r-ctl);padding:6px 6px 6px 14px;position:relative;overflow:hidden}
+.timer .t{font-family:var(--f-display);font-size:28px;font-weight:700;font-variant-numeric:tabular-nums;min-width:68px}
+.timer .bar{position:absolute;left:0;bottom:0;height:4px;background:var(--accent)}
+.timer.zero{border-color:var(--accent)}
+.timer.zero .t{color:var(--accent)}
+details{border-top:1px solid var(--line);padding-top:10px}
+summary{cursor:pointer;font-weight:600;font-size:14px;min-height:32px;display:flex;align-items:center}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--surface-2);border-radius:var(--r-ctl);padding:4px;gap:4px}
+.seg button{min-height:40px;border:0;border-radius:9px;background:transparent;font-weight:600;font-size:14px}
+.seg button[aria-pressed="true"]{background:var(--surface);box-shadow:0 0 0 1px var(--line-strong)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-2)}
+.tablewrap{overflow-x:auto;margin-inline:-4px}
+.bars{display:flex;flex-direction:column;gap:10px}
+.mbar{display:grid;grid-template-columns:96px 1fr 76px;gap:8px;align-items:center;font-size:14px}
+.mbar .track{position:relative;height:12px;background:var(--surface-2);border-radius:6px}
+.mbar .fill{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:var(--accent)}
+.mbar .tick{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--text-2)}
+.mbar .val{text-align:right;font-variant-numeric:tabular-nums}
+svg.chart{width:100%;height:auto;display:block}
+svg.chart text{fill:var(--text-2);font-size:11px;font-family:var(--f-body)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 84px);background:var(--text);color:var(--bg);padding:10px 14px;border-radius:12px;display:flex;gap:12px;align-items:center;z-index:50;font-weight:600;max-width:calc(100% - 32px)}
+.toast button{background:none;border:0;color:inherit;text-decoration:underline;font-weight:700;min-height:36px}
+.empty{padding:20px;text-align:center;color:var(--text-2);border:1.5px dashed var(--line-strong);border-radius:var(--r-card)}
+ul.rules{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+.ev{display:flex;flex-direction:column;gap:2px;padding:10px 0;border-top:1px solid var(--line)}
+.ev a{color:var(--info);font-size:14px;word-break:break-word}
+.tag{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:6px;border:1px solid currentColor}
+.stepper input.needs{outline:2px dashed var(--accent);outline-offset:-4px;border-radius:var(--r-ctl)}
+.round{display:flex;flex-direction:column;gap:6px}
+.roundrow{display:flex;gap:10px;align-items:center;min-height:44px;padding:0 12px;border:1.5px solid var(--line);border-radius:var(--r-ctl);background:var(--surface);text-align:left;font-size:15px}
+.roundrow.on{border-color:var(--accent);background:var(--band)}
+.spark{display:grid;grid-template-columns:minmax(0,1fr) 170px;gap:8px;align-items:center;font-size:14px;padding:6px 0;border-top:1px solid var(--line)}
+.saved{font-size:13px;color:var(--ok);font-weight:600}
+.err{color:var(--danger);font-size:14px;font-weight:600}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+@media (min-width:900px){main{padding-block-end:40px}}
+</style>
+
+<main id="app" aria-live="polite">
+  <div class="card"><p class="eyebrow">Cut Block v9</p><h1>Loading your plan…</h1><p class="muted">Your sessions appear here once the store connects.</p></div>
+</main>
+<nav class="tabs" id="tabs" aria-label="Sections"></nav>
+<div id="toast-host"></div>
+
+<script>
+// Standalone store: stands in for the claude.ai runtime so the app works with no account.
+// Data stays in this browser (localStorage), keyed "cbv9:<path>". Same API surface the app calls.
+(function(){
+  const P = "cbv9:", subs = new Set();
+  const all = () => { const o = {}; for(let i=0;i<localStorage.length;i++){ const k = localStorage.key(i); if(k.startsWith(P)) o[k.slice(P.length)] = k; } return o; };
+  const read = p => { try{ const v = localStorage.getItem(P+p); return v ? JSON.parse(v) : null; }catch(e){ return null; } };
+  const snapDoc = (id, v) => ({ id, exists: v != null, data: () => v && JSON.parse(JSON.stringify(v)) });
+  function query(coll, order, lim){
+    const pre = coll + "/";
+    let docs = Object.keys(all()).filter(p => p.startsWith(pre) && !p.slice(pre.length).includes("/"))
+      .map(p => snapDoc(p.slice(pre.length), read(p)));
+    if(order){ const [f, dir] = order; docs.sort((a,b) => { const x = a.data()[f], y = b.data()[f]; return (x < y ? -1 : x > y ? 1 : 0) * (dir === "desc" ? -1 : 1); }); }
+    if(lim) docs = docs.slice(0, lim);
+    return { docs };
+  }
+  function coll(path, order, lim){
+    return {
+      orderBy: (f, dir) => coll(path, [f, dir || "asc"], lim),
+      limit: n => coll(path, order, n),
+      onSnapshot(cb){ const s = () => cb(query(path, order, lim)); subs.add(s); setTimeout(s, 0); return () => subs.delete(s); }
+    };
+  }
+  const fire = () => subs.forEach(s => { try{ s(); }catch(e){ console.warn(e); } });
+  const db = {
+    collection: p => coll(p),
+    doc: p => ({
+      get: async () => snapDoc(p.split("/").pop(), read(p)),
+      set: async body => { try{ localStorage.setItem(P+p, JSON.stringify(body)); }catch(e){ throw { code: "storage_full" }; } fire(); }
+    })
+  };
+  const downloads = { save: async ({ filename, data }) => {
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], { type: "text/csv" }));
+    a.download = filename; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  } };
+  const user = { id: async () => "me" };
+  try{ navigator.storage && navigator.storage.persist && navigator.storage.persist(); }catch(e){}
+  window.claude = { use: async n => ({ db, user, downloads })[n] || null };
+})();
+</script>
+<script>
+const PLAN = {"meta": {"version": "v9.0", "startDate": "2026-10-12", "weeks": 16, "units": "lb", "elbowRirOffset": 1, "e1rmFormula": "load × (1 + (reps + RIR) / 30)", "keyLifts": ["S1-01", "S3-01", "S2-02", "S3-04"], "finisherWeeks": [3, 4, 7, 8, 10, 11, 12], "rotation": {"block": "Version A in weeks 1-4 and 9-12, version B in weeks 5-8 and 13-16", "week": "Odd weeks first version, even weeks second"}, "schedule": {"standard": {"mon": "S1", "tue": "S2", "wed": "S3", "thu": "S4", "fri": "S5", "sat": "S6", "sun": null}, "fallback": ["F1", "F2", "F3"]}, "muscles": {"chest": {"lo": 18, "hi": 20, "label": "Chest", "basis": "effective"}, "biceps": {"lo": 18, "hi": 20, "label": "Biceps", "basis": "effective"}, "triceps": {"lo": 18, "hi": 20, "label": "Triceps", "basis": "effective"}, "calves": {"lo": 12, "hi": 16, "label": "Calves", "basis": "effective"}, "quads": {"lo": 12, "hi": 14, "label": "Quads", "basis": "effective"}, "hamsglutes": {"lo": 10, "hi": 12, "label": "Hams/glutes", "basis": "effective"}, "back": {"lo": 18, "hi": 20, "label": "Back", "basis": "effective"}, "delts": {"lo": 14, "hi": 18, "label": "Delts", "basis": "effective"}, "traps": {"lo": 4, "hi": 8, "label": "Traps", "basis": "effective"}, "abs": {"lo": 8, "hi": 10, "label": "Abs", "basis": "effective"}}, "fallbackMuscles": {"chest": {"lo": 9, "hi": 12}, "biceps": {"lo": 6, "hi": 10}, "triceps": {"lo": 6, "hi": 10}, "calves": {"lo": 4, "hi": 9}, "quads": {"lo": 4, "hi": 6}, "hamsglutes": {"lo": 4, "hi": 6}, "back": {"lo": 6, "hi": 9}, "delts": {"lo": 4, "hi": 6}, "traps": {"lo": 0, "hi": 4}, "abs": {"lo": 0, "hi": 6}}, "hardSetMaxRir": 4, "warmupMin": 8, "workSec": 45, "rules": {"trim": ["45 min: one warm-up ramp, drop the last set of each exercise, superset opposing moves.", "30 min: the session's priority muscles only, 3 exercises × 3 sets as supersets.", "Under 20 min: 2 exercises × 3 sets for the main muscle. It still counts.", "Never double up a missed session.", "The app builds the 30-minute version from each session's priority-1 exercises, max 3 sets each."], "fallbackEnter": ["Fallback days are any 3 days of the week, ideally not back-to-back.", "2+ of 6 sessions missed or impossible by end of Wednesday.", "A known disruption of 3+ days is coming.", "Under 6 h sleep 3 nights in a row."], "fallbackExit": ["5+ sessions available next week (decide Sunday).", "First week back: volume at the lower of the plan and 0.90, +1 RIR on compounds.", "Fallback 2+ weeks: repeat a week-1 calibration week first.", "3 fallback weeks in a row: re-plan the schedule.", "14+ days with no training: restart at week-1 calibration.", "Fallback triggered 3+ times in weeks 1-8: the 6-day frame is wrong for your life. Re-plan as a 4-day upper/lower."], "advanced": ["Anchor lifts: back squat (Wed) and machine incline press (Thu), 2-3 RIR, no grinders. Trap-bar deadlift replaces the RDL in even weeks.", "Supersets and giant sets: A1, A2, A3 run back to back, about 15 s apart; rest only after the last one. The logger moves you through the group.", "Pauses, 1¼ reps and tempo are part of the prescription every week, elbow-flagged arm lifts included. Each technique switches with the exercise rotation (weeks 5-8 and 13-16).", "Intensity finishers (drop sets, myo-reps, rest-pause, lengthened partials) run only in build weeks (3-4, 7-8, 10-12), on the last set of marked machine and cable lifts. Never on elbow lifts, never in deloads or weeks 13-16. A finisher counts as one extra set.", "Six accessories switch versions every 4 weeks. Each version keeps its own history, so loads prefill correctly.", "Held until after the cut: heavy conventional deadlifts and Olympic lifts (the clean catch loads the inner-elbow tendon). Smith machine and barbell bench are out by owner preference."], "progression": ["Work inside the rep range at the week's RIR target.", "When every working set hits the top of the range at or below target RIR, add the smallest load step next time.", "Holding = every key lift at or above 97% of its week 3-4 e1RM benchmark. After week 8, holding is the goal.", "Amber: one key lift under 97% for a week, or reps under the range at the same load twice. Hold loads and volume for a week.", "Red: 2+ key lifts under 93%, or amber 2 weeks running. Take an early deload: half sets, 4+ RIR, 5-7 days.", "Key lifts: incline DB press, lat pulldown, leg press, incline DB curl. e1RM = load × (1 + (reps + RIR) / 30), always including RIR.", "Second red within 3 weeks of an early deload: bring the diet break forward."], "elbow": ["Exercises marked elbow use the week's isolation RIR + 1 (RIR 2 when the table says 1). Never below RIR 2.", "Golfer's elbow (inner elbow): gripping and loaded wrist flexion aggravate it. Dips and triceps work are usually fine.", "During a set, pain ≤ 3/10 that settles by next morning is acceptable.", "≥ 4/10, sharp, or still worse next morning: swap the exercise next time (neutral grip, cable, shorter range, lighter) and keep the sets.", "Straps on heavy rows, pulldowns and RDLs. No heavy wrist curls for size; the light isometric/eccentric drill (Mon, Wed, Sat) is rehab. Neutral or EZ grips on curls.", "Flare: drop load 20%, add 2-3 reps, +1 RIR. After 7 pain-free days return at 70% and build over 2 weeks.", "Two flares in a month: drop that exercise for the block and see a clinician.", "See a clinician now, not after two flares: numbness or tingling in the ring/little finger, night pain, visible swelling, a pop, or grip weakness. On overhead extensions, stop short of full stretch if the ring/little finger tingles."], "cardio": ["Walking only: steps plus incline treadmill. No running or intervals.", "Conversational pace, hands off the rails. Cap 12% incline and 3.5 mph.", "Walk after lifting or 3+ h apart; never before a heavy leg day.", "Steps stay at 8,000 and walks at 3 a week."], "safety": ["Stop and get medical care for chest pain or pressure, unusual breathlessness, fainting or near-fainting, or palpitations during lifting or walking.", "This plan is not medical advice. Your physician decides on tests and clearance."]}}, "weeks": [{"week": 1, "phase": "cut", "label": "Calibrate", "setsMult": 0.8, "rirCompound": "3", "rirIsolation": "2", "deficit": true, "steps": 8000, "incline": "3 × 20-25 min, 3.0 mph, 8-10%"}, {"week": 2, "phase": "cut", "label": "Build", "setsMult": 0.9, "rirCompound": "3", "rirIsolation": "2", "deficit": true, "steps": 8000, "incline": "3 × 20-25 min, 3.0 mph, 8-10%"}, {"week": 3, "phase": "cut", "label": "Build", "setsMult": 1.0, "rirCompound": "2-3", "rirIsolation": "1-2", "deficit": true, "steps": 8000, "incline": "3 × 20-25 min, 3.0 mph, 8-10%"}, {"week": 4, "phase": "cut", "label": "Peak 1", "setsMult": 1.0, "rirCompound": "2", "rirIsolation": "1", "deficit": true, "steps": 8000, "incline": "3 × 20-25 min, 3.0 mph, 8-10%"}, {"week": 5, "phase": "deload", "label": "Deload", "setsMult": 0.5, "rirCompound": "4+", "rirIsolation": "3", "deficit": true, "steps": 8000, "incline": "2 × 20-25 min, 3.0 mph, 8-10% (deload)"}, {"week": 6, "phase": "cut", "label": "Re-entry", "setsMult": 0.95, "rirCompound": "3", "rirIsolation": "2", "deficit": true, "steps": 8000, "incline": "3 × 20-25 min, 3.0 mph, 8-10%"}, {"week": 7, "phase": "cut", "label": "Build", "setsMult": 1.0, "rirCompound": "2", "rirIsolation": "1-2", "deficit": true, "steps": 8000, "incline": "3 × 20-25 min, 3.0 mph, 8-10%"}, {"week": 8, "phase": "cut", "label": "Peak 2", "setsMult": 1.0, "rirCompound": "2", "rirIsolation": "1", "deficit": true, "steps": 8000, "incline": "3 × 20-25 min, 3.0 mph, 8-10%"}, {"week": 9, "phase": "diet_break", "label": "Diet break", "setsMult": 0.9, "rirCompound": "2", "rirIsolation": "2", "deficit": false, "steps": 8000, "incline": "3 × 20-25 min, 3.0 mph, 8-10%"}, {"week": 10, "phase": "cut", "label": "Re-enter deficit", "setsMult": 1.0, "rirCompound": "2", "rirIsolation": "1", "deficit": true, "steps": 8000, "incline": "3 × 20-25 min, 3.0 mph, 8-10%"}, {"week": 11, "phase": "cut", "label": "Build", "setsMult": 0.95, "rirCompound": "2", "rirIsolation": "1", "deficit": true, "steps": 8000, "incline": "3 × 20-25 min, 3.0 mph, 8-10%"}, {"week": 12, "phase": "cut", "label": "Peak 3", "setsMult": 0.9, "rirCompound": "2-3", "rirIsolation": "1", "deficit": true, "steps": 8000, "incline": "3 × 20-25 min, 3.0 mph, 8-10%"}, {"week": 13, "phase": "deload", "label": "Deload", "setsMult": 0.5, "rirCompound": "4+", "rirIsolation": "3", "deficit": true, "steps": 8000, "incline": "2 × 20-25 min, 3.0 mph, 8-10% (deload)"}, {"week": 14, "phase": "cut", "label": "Late-cut re-entry", "setsMult": 0.85, "rirCompound": "3", "rirIsolation": "1-2", "deficit": true, "steps": 8000, "incline": "3 × 20-25 min, 3.0 mph, 8-10%"}, {"week": 15, "phase": "cut", "label": "Late cut", "setsMult": 0.85, "rirCompound": "2-3", "rirIsolation": "1", "deficit": true, "steps": 8000, "incline": "3 × 20-25 min, 3.0 mph, 8-10%"}, {"week": 16, "phase": "cut", "label": "Final + strength check", "setsMult": 0.8, "rirCompound": "2-3", "rirIsolation": "1", "deficit": true, "steps": 8000, "incline": "3 × 20-25 min, 3.0 mph, 8-10%"}], "sessions": [{"id": "S1", "day": "mon", "title": "Chest & back A", "subtitle": "Dumbbell and dip day", "slotMin": 75, "focus": ["chest", "back"], "exercises": [{"id": "S1-01", "name": "Incline DB press, 30°, semi-neutral grip", "muscle": "chest", "kind": "compound", "sets": 4, "repLo": 6, "repHi": 10, "restSec": 180, "incr": 5, "technique": "2 s pause on the chest", "cue": "Deep stretch at the bottom, press up and slightly in, ribs down", "elbowNote": "Semi-neutral wrists; stop a rep short of any inner-elbow pinch", "credit": {"chest": 1, "triceps": 0.5}, "elbow": false, "alts": [], "addedLoad": false, "keyLift": true, "priority": 1, "techniqueB": "1¼ reps: full rep plus a bottom-quarter rep"}, {"id": "S1-03", "name": "Incline DB fly, 30°", "muscle": "chest", "kind": "isolation", "sets": 3, "repLo": 10, "repHi": 15, "restSec": 75, "incr": 5, "technique": "1¼ reps in the stretch", "cue": "Deep stretch, slight elbow bend, stop at vertical", "elbowNote": "Fixed elbow angle; light enough to own the stretch", "credit": {"chest": 1}, "elbow": false, "alts": [], "addedLoad": false, "priority": 2, "finisher": "Lengthened partials: +5-8 half reps in the stretch", "group": "A", "techniqueB": "2 s stretch pause"}, {"id": "S3-02", "name": "Chest-supported row, elbows ~45°", "muscle": "back", "kind": "compound", "sets": 3, "repLo": 8, "repHi": 12, "restSec": 120, "incr": 5, "technique": "1 s squeeze", "cue": "Chest on the pad, reach long then row", "elbowNote": "Straps on", "credit": {"back": 1, "biceps": 0.5}, "elbow": false, "alts": ["Chest-supported DB row on an incline bench", "Seated cable row, neutral grip"], "addedLoad": false, "priority": 2, "rotate": "block", "variants": [null, {"id": "S3-02b", "name": "Chest-supported T-bar row", "cue": "Chest on pad, elbows ~45°", "techniqueB": "1¼ reps from the stretch"}], "group": "A", "techniqueB": "1¼ reps from the stretch"}, {"id": "S3-01", "name": "Neutral or MAG-grip lat pulldown", "muscle": "back", "kind": "compound", "sets": 4, "repLo": 8, "repHi": 12, "restSec": 120, "incr": 5, "technique": "2 s stretch at the top", "cue": "Elbows down and in, full lat stretch", "elbowNote": "Use straps: unloads the forearm flexors (golfer's elbow)", "credit": {"back": 1, "biceps": 0.5}, "elbow": false, "alts": [], "addedLoad": false, "keyLift": true, "priority": 1, "techniqueB": "1¼ reps from the stretch"}, {"id": "S1-02", "name": "Dip, chest lean", "muscle": "chest", "kind": "compound", "sets": 3, "repLo": 8, "repHi": 12, "restSec": 120, "incr": 5, "technique": "2 s pause at the bottom", "cue": "Lean forward, elbows ~45°, lower until the upper arm is just below parallel or the shoulder says stop", "elbowNote": "Load = added lb (0 = bodyweight). Owner reports dips are elbow-safe", "credit": {"chest": 1, "triceps": 0.5}, "elbow": false, "alts": [], "addedLoad": true, "priority": 1, "group": "B", "techniqueB": "Controlled 3 s lower"}, {"id": "S1-09", "name": "Straight-arm cable pulldown", "muscle": "back", "kind": "isolation", "sets": 3, "repLo": 12, "repHi": 15, "restSec": 75, "incr": 5, "technique": "2 s squeeze at the hips", "cue": "Arms long, sweep the bar to the thighs, ribs down", "elbowNote": "Rope or bar, light grip", "credit": {"back": 1}, "elbow": false, "alts": [], "addedLoad": false, "group": "B", "techniqueB": "1¼ reps from the top", "priority": 2}, {"id": "S3-06", "name": "Wrist flexor/pronator isometric (rehab, not counted)", "muscle": "none", "kind": "isolation", "sets": 3, "repLo": 1, "repHi": 1, "restSec": 45, "incr": 0, "technique": "30-45 s hold at moderate effort, elbow slightly bent", "cue": "Pain ≤ 3/10. Progress to 3 s eccentrics when pain-free", "elbowNote": "Golfer's elbow rehab: loads the tendon so it adapts", "credit": {}, "elbow": true, "alts": [], "addedLoad": false, "priority": 3}]}, {"id": "S2", "day": "tue", "title": "Shoulders & arms A", "subtitle": "Press, delt superset, arm supersets", "slotMin": 75, "focus": ["delts", "biceps", "triceps"], "exercises": [{"id": "S1-08", "name": "Seated DB shoulder press, neutral grip", "muscle": "delts", "kind": "compound", "sets": 3, "repLo": 8, "repHi": 12, "restSec": 120, "incr": 5, "technique": "1 s pause at the bottom", "cue": "Back on the pad, press up and slightly in, stop just short of lockout", "elbowNote": "Neutral grip spares the inner elbow", "credit": {"delts": 1, "triceps": 0.5}, "elbow": false, "alts": [], "addedLoad": false, "priority": 1, "techniqueB": "1¼ reps: bottom half"}, {"id": "S1-04", "name": "Cable lateral raise, behind body", "muscle": "delts", "kind": "isolation", "sets": 4, "repLo": 12, "repHi": 20, "restSec": 75, "incr": 2.5, "technique": "Lead with the elbow, 1 s hold at the top", "cue": "Lead with the elbow, cable crossing behind you", "elbowNote": "Light load", "credit": {"delts": 1}, "elbow": false, "alts": [], "addedLoad": false, "priority": 2, "group": "A", "techniqueB": "1¼ reps at the top", "finisher": "Drop set: strip 30% twice"}, {"id": "S3-03", "name": "Reverse pec deck or rear-delt cable fly", "muscle": "delts", "kind": "isolation", "sets": 3, "repLo": 12, "repHi": 20, "restSec": 75, "incr": 5, "technique": "1 s squeeze", "cue": "Wide arc, thumbs neutral", "elbowNote": "Light", "credit": {"delts": 1}, "elbow": false, "alts": ["Rear-delt cable fly", "Chest-supported DB rear raise"], "addedLoad": false, "priority": 2, "group": "A", "techniqueB": "2 s pause at full contraction"}, {"id": "S3-04", "name": "Incline DB curl, semi-supinated", "muscle": "biceps", "kind": "isolation", "sets": 3, "repLo": 8, "repHi": 12, "restSec": 90, "incr": 5, "technique": "3 s lower into the stretch", "cue": "Shoulders back on the bench, deep stretch", "elbowNote": "Wrist neutral, no wrist curl at the top; swap to hammer if the inner elbow aches", "credit": {"biceps": 1}, "elbow": true, "alts": ["Cable rope hammer curl"], "addedLoad": false, "priority": 1, "keyLift": true, "group": "B", "techniqueB": "1¼ reps from the stretch"}, {"id": "S1-05", "name": "Overhead rope triceps extension", "muscle": "triceps", "kind": "isolation", "sets": 3, "repLo": 10, "repHi": 15, "restSec": 90, "incr": 5, "technique": "1 s stretch pause", "cue": "Elbows forward and fixed, full stretch behind head", "elbowNote": "Rope grip; first swap if the elbow flares", "credit": {"triceps": 1}, "elbow": true, "alts": ["Single-arm cable pressdown"], "addedLoad": false, "priority": 1, "rotate": "block", "variants": [null, {"id": "S1-05b", "name": "EZ-bar cable overhead extension", "cue": "Elbows forward, full stretch", "techniqueB": "1¼ reps from the stretch"}], "group": "B", "techniqueB": "1¼ reps from the stretch"}, {"id": "S3-05", "name": "EZ-bar cheat curl", "muscle": "biceps", "kind": "isolation", "sets": 3, "repLo": 6, "repHi": 10, "restSec": 75, "incr": 5, "technique": "Strict reps first; 2-3 cheat reps on the last set only", "cue": "Small hip drive past the sticking point, then a slow 3 s lower", "elbowNote": "EZ grip; no cheat reps if the inner elbow aches, swap to rope hammer curl", "credit": {"biceps": 1}, "elbow": true, "alts": ["Cable rope hammer curl"], "addedLoad": false, "priority": 2, "group": "C"}, {"id": "S1-06", "name": "Rope pressdown", "muscle": "triceps", "kind": "isolation", "sets": 3, "repLo": 12, "repHi": 20, "restSec": 75, "incr": 5, "technique": "2 s squeeze at lockout", "cue": "Split the rope at the bottom, no lean", "elbowNote": "Light, high reps spare the tendon", "credit": {"triceps": 1}, "elbow": true, "alts": [], "addedLoad": false, "priority": 2, "group": "C", "techniqueB": "1¼ reps at lockout"}]}, {"id": "S3", "day": "wed", "title": "Legs A", "subtitle": "Squat, press, Bulgarians, calf-and-abs giant set", "slotMin": 75, "focus": ["quads", "hamsglutes", "calves"], "exercises": [{"id": "S2-01", "name": "Back squat (safety-squat bar or high-bar, thumbless grip)", "muscle": "quads", "kind": "compound", "sets": 3, "repLo": 5, "repHi": 8, "restSec": 180, "incr": 5, "technique": "Pause squat: 2 s in the hole", "cue": "Brace, sit between the heels, drive up hard", "elbowNote": "SSB or thumbless high-bar: low-bar wrist and elbow strain aggravates golfer's elbow", "credit": {"quads": 1}, "elbow": false, "alts": ["High-bar back squat, thumbless grip", "Hack squat"], "addedLoad": false, "priority": 1, "techniqueB": "Tempo: 3 s down, 1 s pause"}, {"id": "S2-02", "name": "Leg press, feet low-mid", "muscle": "quads", "kind": "compound", "sets": 3, "repLo": 10, "repHi": 15, "restSec": 120, "incr": 10, "technique": "1¼ reps: full rep plus a bottom-quarter rep", "cue": "Stop before the pelvis tucks", "elbowNote": "Cap depth where the pelvis stays flat", "credit": {"quads": 1}, "elbow": false, "alts": ["Hack squat", "Goblet squat to a box, strapped"], "addedLoad": false, "keyLift": true, "priority": 1, "techniqueB": "4 s lower"}, {"id": "S3-08", "name": "Bulgarian split squat", "muscle": "quads", "kind": "compound", "sets": 3, "repLo": 8, "repHi": 12, "restSec": 75, "incr": 5, "technique": "1¼ reps; each set = both legs", "cue": "Slight forward lean, front heel down, deep stretch", "elbowNote": "Straps on the DBs, or a safety-bar version: grip loads the inner elbow", "credit": {"quads": 1, "hamsglutes": 0.5}, "elbow": false, "alts": ["Walking lunge (DBs, strapped)", "Safety-bar split squat"], "addedLoad": false, "perSide": true, "techniqueB": "2 s pause at the bottom; each set = both legs", "priority": 1}, {"id": "S2-03", "name": "Seated leg curl", "muscle": "hamsglutes", "kind": "isolation", "sets": 3, "repLo": 8, "repHi": 12, "restSec": 90, "incr": 5, "technique": "Full stretch each rep", "cue": "Hips pinned, curl from full stretch", "elbowNote": "Machine", "credit": {"hamsglutes": 1}, "elbow": false, "alts": ["Lying leg curl", "Single-leg cable curl"], "addedLoad": false, "priority": 2, "finisher": "Lengthened partials: +5 reps in the bottom half", "rotate": "block", "variants": [null, {"id": "S2-03b", "name": "Lying leg curl", "cue": "Hips down, full stretch", "techniqueB": "2 s squeeze at the top"}], "techniqueB": "2 s squeeze at the top"}, {"id": "S2-04", "name": "Standing calf raise", "muscle": "calves", "kind": "isolation", "sets": 4, "repLo": 6, "repHi": 10, "restSec": 60, "incr": 10, "technique": "2 s stretch hold at the bottom", "cue": "Full stretch, hard squeeze at the top, no bounce", "elbowNote": "None", "credit": {"calves": 1}, "elbow": false, "alts": ["Leg press calf raise", "Single-leg DB calf raise on a step"], "addedLoad": false, "priority": 2, "finisher": "Rest-pause: 15 s, then 2 more mini-sets", "rotate": "block", "variants": [null, {"id": "S2-04b", "name": "Donkey or hack-squat calf raise", "cue": "Full stretch, 2 s hold"}], "group": "C"}, {"id": "S6-07", "name": "Seated calf raise", "muscle": "calves", "kind": "isolation", "sets": 3, "repLo": 15, "repHi": 25, "restSec": 60, "incr": 10, "technique": "2 s stretch at the bottom", "cue": "Slow", "elbowNote": "None", "credit": {"calves": 1}, "elbow": false, "alts": ["Seated DB calf raise", "Leg press calf raise, knees bent"], "addedLoad": false, "priority": 2, "group": "C"}, {"id": "S3-07", "name": "Cable rope crunch", "muscle": "abs", "kind": "isolation", "sets": 3, "repLo": 10, "repHi": 15, "restSec": 60, "incr": 5, "technique": "2 s squeeze", "cue": "Hips still, curl ribs to pelvis", "elbowNote": "Light grip, elbow-safe", "credit": {"abs": 1}, "elbow": false, "alts": [], "addedLoad": false, "group": "C", "priority": 2}, {"id": "S2-05", "name": "Tibialis raise (not counted)", "muscle": "none", "kind": "isolation", "sets": 2, "repLo": 15, "repHi": 25, "restSec": 45, "incr": 0, "technique": "Straight sets", "cue": "Toes up, slow", "elbowNote": "Shin and knee health", "credit": {}, "elbow": false, "alts": [], "addedLoad": false, "priority": 3}, {"id": "S5-08", "name": "Wrist flexor/pronator isometric (rehab, not counted)", "muscle": "none", "kind": "isolation", "sets": 3, "repLo": 1, "repHi": 1, "restSec": 45, "incr": 0, "technique": "30-45 s hold at moderate effort, elbow slightly bent", "cue": "Pain ≤ 3/10. Progress to 3 s eccentrics when pain-free", "elbowNote": "Golfer's elbow rehab: loads the tendon so it adapts", "credit": {}, "elbow": true, "alts": [], "addedLoad": false, "priority": 3}]}, {"id": "S4", "day": "thu", "title": "Chest & back B", "subtitle": "Machine incline, antagonist supersets", "slotMin": 75, "focus": ["chest", "back"], "exercises": [{"id": "S4-10", "name": "Plate-loaded machine incline press", "muscle": "chest", "kind": "compound", "sets": 4, "repLo": 6, "repHi": 10, "restSec": 150, "incr": 10, "technique": "2 s pause at the stretch", "cue": "Seat so the handles start at upper chest; drive up and in", "elbowNote": "Neutral handles if the machine has them", "credit": {"chest": 1, "triceps": 0.5}, "elbow": false, "alts": ["Selectorized incline press", "Incline DB press, 30°"], "addedLoad": false, "techniqueB": "1¼ reps from the stretch", "finisher": "Rest-pause: 15 s, then 2 mini-sets", "priority": 1}, {"id": "S5-02", "name": "Chest-supported row, wide elbows", "muscle": "back", "kind": "compound", "sets": 4, "repLo": 10, "repHi": 15, "restSec": 120, "incr": 5, "technique": "1 s squeeze", "cue": "Upper-back bias, reach forward each rep", "elbowNote": "Straps on", "credit": {"back": 1, "biceps": 0.5}, "elbow": false, "alts": ["Chest-supported DB row, elbows wide", "Wide-grip seated cable row"], "addedLoad": false, "priority": 1, "group": "A", "techniqueB": "2 s pause at the chest"}, {"id": "S6-01", "name": "Pec deck, stretch pause", "muscle": "chest", "kind": "isolation", "sets": 3, "repLo": 12, "repHi": 20, "restSec": 120, "incr": 5, "technique": "2 s pause at full stretch", "cue": "Arms wide, feel the stretch", "elbowNote": "Skip if the shoulder pinches", "credit": {"chest": 1}, "elbow": false, "alts": ["Cable fly, low pulleys", "Flat DB fly"], "addedLoad": false, "priority": 1, "finisher": "Myo-reps: then 3 × 3-5 reps with 5 breaths between", "group": "A", "techniqueB": "1¼ reps in the stretch"}, {"id": "S5-03", "name": "Low-to-high cable fly", "muscle": "chest", "kind": "isolation", "sets": 3, "repLo": 12, "repHi": 20, "restSec": 75, "incr": 5, "technique": "1¼ reps in the stretch", "cue": "Hands rise to the upper chest", "elbowNote": "Fixed elbow angle", "credit": {"chest": 1}, "elbow": false, "alts": [], "addedLoad": false, "priority": 2, "group": "B", "techniqueB": "2 s squeeze at the top"}, {"id": "S5-04", "name": "Half-kneeling single-arm pulldown", "muscle": "back", "kind": "isolation", "sets": 3, "repLo": 10, "repHi": 15, "restSec": 75, "incr": 5, "technique": "2 s stretch", "cue": "Long lat stretch overhead", "elbowNote": "Light, neutral grip", "credit": {"back": 1}, "elbow": false, "alts": [], "addedLoad": false, "priority": 2, "group": "B", "techniqueB": "1¼ reps from the stretch"}, {"id": "S4-11", "name": "Seated cable row, neutral grip", "muscle": "back", "kind": "compound", "sets": 3, "repLo": 10, "repHi": 15, "restSec": 75, "incr": 5, "technique": "1 s squeeze", "cue": "Chest tall, reach long, row to the lower ribs", "elbowNote": "Straps on", "credit": {"back": 1, "biceps": 0.5}, "elbow": false, "alts": ["Chest-supported DB row on an incline bench", "Single-arm DB row, strapped"], "addedLoad": false, "group": "C", "techniqueB": "2 s stretch pause", "priority": 2}, {"id": "S5-07", "name": "Captain's-chair leg raise", "muscle": "abs", "kind": "isolation", "sets": 3, "repLo": 10, "repHi": 15, "restSec": 75, "incr": 0, "technique": "Slow lower, curl the pelvis up", "cue": "Knees to chest, then posterior tilt at the top", "elbowNote": "Forearm pads, no hanging grip", "credit": {"abs": 1}, "elbow": false, "alts": ["Decline bench reverse crunch", "Lying leg raise"], "addedLoad": false, "group": "C", "priority": 2}, {"id": "S4-12", "name": "Heavy trap-bar shrug", "muscle": "traps", "kind": "isolation", "sets": 4, "repLo": 8, "repHi": 12, "restSec": 90, "incr": 10, "technique": "2 s hold at the top", "cue": "Stand tall, shoulders straight up to the ears, no rolling", "elbowNote": "Straps on: grip is the golfer's-elbow risk", "credit": {"traps": 1}, "elbow": false, "alts": ["Heavy DB shrug, strapped", "Barbell shrug, strapped"], "addedLoad": false, "techniqueB": "1¼ reps at the top", "finisher": "Rest-pause: 10 s, then 2 mini-sets", "priority": 2}]}, {"id": "S5", "day": "fri", "title": "Shoulders & arms B", "subtitle": "Delt superset, arm supersets", "slotMin": 75, "focus": ["delts", "biceps", "triceps"], "exercises": [{"id": "S5-05", "name": "Lean-away lateral raise", "muscle": "delts", "kind": "isolation", "sets": 3, "repLo": 12, "repHi": 20, "restSec": 60, "incr": 2.5, "technique": "Straight sets", "cue": "Lean away, lift out and slightly forward", "elbowNote": "Light", "credit": {"delts": 1}, "elbow": false, "alts": [], "addedLoad": false, "priority": 1, "finisher": "Myo-reps: then 3 × 3-5 reps with 5 breaths between", "rotate": "block", "variants": [null, {"id": "S5-05b", "name": "Cable Y-raise", "cue": "Arms out in a Y, lead with the pinky"}], "group": "A"}, {"id": "S5-06", "name": "Reverse pec deck", "muscle": "delts", "kind": "isolation", "sets": 3, "repLo": 15, "repHi": 25, "restSec": 60, "incr": 5, "technique": "2 s squeeze", "cue": "Lead with the pinky side", "elbowNote": "Light", "credit": {"delts": 1}, "elbow": false, "alts": ["Rear-delt cable fly", "Chest-supported DB rear raise"], "addedLoad": false, "priority": 2, "group": "A", "techniqueB": "1¼ reps at full contraction"}, {"id": "S6-02", "name": "Cable EZ-bar curl", "muscle": "biceps", "kind": "isolation", "sets": 2, "repLo": 12, "repHi": 20, "restSec": 60, "incr": 5, "technique": "2 s squeeze at the top", "cue": "Elbows still, slow lower", "elbowNote": "EZ attachment, never a straight bar", "credit": {"biceps": 1}, "elbow": true, "alts": [], "addedLoad": false, "priority": 1, "group": "B", "techniqueB": "1¼ reps: bottom half"}, {"id": "S6-03", "name": "Single-arm overhead cable extension", "muscle": "triceps", "kind": "isolation", "sets": 3, "repLo": 12, "repHi": 20, "restSec": 60, "incr": 2.5, "technique": "Full stretch, elbow fixed", "cue": "Full stretch, elbow fixed", "elbowNote": "Swap to pressdown on a flare", "credit": {"triceps": 1}, "elbow": true, "alts": [], "addedLoad": false, "priority": 1, "group": "B", "techniqueB": "1¼ reps from the stretch"}, {"id": "S5-09", "name": "EZ-bar preacher curl", "muscle": "biceps", "kind": "isolation", "sets": 2, "repLo": 8, "repHi": 12, "restSec": 75, "incr": 5, "technique": "3 s lower, stop just short of lockout", "cue": "Armpits on the pad, curl to forehead height, no shoulder roll", "elbowNote": "EZ grip; stop short of full extension, where the inner elbow takes the load", "credit": {"biceps": 1}, "elbow": true, "alts": ["Machine preacher curl", "DB preacher curl over an incline bench", "Cable rope hammer curl"], "addedLoad": false, "group": "C", "techniqueB": "1¼ reps: bottom half", "priority": 2}, {"id": "S5-10", "name": "EZ-bar skull crusher", "muscle": "triceps", "kind": "isolation", "sets": 3, "repLo": 8, "repHi": 12, "restSec": 75, "incr": 5, "technique": "2 s lower to the forehead", "cue": "Upper arms angled slightly back, elbows in, lower to the forehead or just behind", "elbowNote": "Triceps work is usually elbow-friendly; soft elbows at the top", "credit": {"triceps": 1}, "elbow": true, "alts": ["Single-arm cable pressdown", "Overhead rope triceps extension"], "addedLoad": false, "group": "C", "techniqueB": "1¼ reps from the stretch", "priority": 2}, {"id": "S6-04", "name": "Rope hammer curl", "muscle": "biceps", "kind": "isolation", "sets": 2, "repLo": 12, "repHi": 15, "restSec": 60, "incr": 5, "technique": "1¼ reps from the bottom", "cue": "Neutral wrist, elbows pinned", "elbowNote": "Owner-added arm volume", "credit": {"biceps": 1}, "elbow": true, "alts": [], "addedLoad": false, "priority": 2, "techniqueB": "3 s lower"}]}, {"id": "S6", "day": "sat", "title": "Legs B", "subtitle": "Hinge, Bulgarians, calf-and-abs giant set", "slotMin": 75, "focus": ["hamsglutes", "quads", "calves"], "exercises": [{"id": "S4-01", "name": "Romanian deadlift (DB or bar)", "muscle": "hamsglutes", "kind": "compound", "sets": 3, "repLo": 8, "repHi": 10, "restSec": 150, "incr": 10, "technique": "3 s lower, stop at the hamstring stretch", "cue": "Hips back, flat back, don't chase depth", "elbowNote": "Straps on; RIR 2 floor; skip on a back flare day", "credit": {"hamsglutes": 1}, "elbow": false, "alts": [], "addedLoad": false, "priority": 1, "rotate": "week", "variants": [null, {"id": "S4-01t", "name": "Trap-bar deadlift", "sets": 3, "repLo": 3, "repHi": 5, "restSec": 180, "incr": 10, "kind": "compound", "technique": "Heavy, full reset each rep, no grinders", "cue": "Push the floor away, hips and chest rise together", "elbowNote": "Straps on; stop at RIR 2-3", "techniqueB": "Heavy, full reset each rep, no grinders"}], "techniqueB": "1 s pause just below the knee"}, {"id": "S4-08", "name": "Bulgarian split squat", "muscle": "quads", "kind": "compound", "sets": 3, "repLo": 8, "repHi": 12, "restSec": 75, "incr": 5, "technique": "2 s pause at the bottom; each set = both legs", "cue": "Slight forward lean, front heel down, deep stretch", "elbowNote": "Straps on the DBs, or a safety-bar version: grip loads the inner elbow", "credit": {"quads": 1, "hamsglutes": 0.5}, "elbow": false, "alts": ["Walking lunge (DBs, strapped)", "Safety-bar split squat"], "addedLoad": false, "perSide": true, "techniqueB": "1¼ reps; each set = both legs", "priority": 1}, {"id": "S4-02", "name": "Machine hip thrust", "muscle": "hamsglutes", "kind": "compound", "sets": 2, "repLo": 10, "repHi": 15, "restSec": 90, "incr": 10, "technique": "2 s squeeze at lockout", "cue": "Ribs down, posterior tilt at the top", "elbowNote": "Low spinal shear", "credit": {"hamsglutes": 1}, "elbow": false, "alts": ["Barbell hip thrust on a bench", "Single-leg hip thrust"], "addedLoad": false, "priority": 2, "techniqueB": "1¼ reps at the top"}, {"id": "S4-03", "name": "Leg extension", "muscle": "quads", "kind": "isolation", "sets": 2, "repLo": 12, "repHi": 20, "restSec": 75, "incr": 5, "technique": "1¼ reps at the top", "cue": "Squeeze at the top, slow lower", "elbowNote": "Watch the patellar tendon", "credit": {"quads": 1}, "elbow": false, "alts": ["Single-leg cable extension", "Sissy squat, bodyweight"], "addedLoad": false, "priority": 2, "finisher": "Drop set: strip 30%, go to RIR 1", "techniqueB": "2 s squeeze at the top"}, {"id": "S6-06", "name": "Leg press calf raise", "muscle": "calves", "kind": "isolation", "sets": 4, "repLo": 10, "repHi": 15, "restSec": 60, "incr": 10, "technique": "2 s stretch", "cue": "Full stretch", "elbowNote": "None", "credit": {"calves": 1}, "elbow": false, "alts": ["Standing calf raise", "Single-leg DB calf raise on a step"], "addedLoad": false, "priority": 1, "group": "C"}, {"id": "S4-04", "name": "Seated calf raise", "muscle": "calves", "kind": "isolation", "sets": 3, "repLo": 10, "repHi": 15, "restSec": 60, "incr": 10, "technique": "2 s stretch at the bottom", "cue": "Soleus bias, deep stretch", "elbowNote": "None", "credit": {"calves": 1}, "elbow": false, "alts": ["Seated DB calf raise", "Leg press calf raise, knees bent"], "addedLoad": false, "priority": 2, "group": "C"}, {"id": "S4-09", "name": "RKC plank", "muscle": "abs", "kind": "isolation", "sets": 3, "repLo": 20, "repHi": 30, "restSec": 60, "incr": 0, "technique": "Reps = seconds; max tension", "cue": "Squeeze glutes and quads, pull elbows to toes", "elbowNote": "Forearms down; no grip load", "credit": {"abs": 1}, "elbow": false, "alts": [], "addedLoad": false, "group": "C", "priority": 2}, {"id": "S4-05", "name": "Tibialis raise (not counted)", "muscle": "none", "kind": "isolation", "sets": 2, "repLo": 15, "repHi": 25, "restSec": 45, "incr": 0, "technique": "Straight sets", "cue": "Slow", "elbowNote": "None", "credit": {}, "elbow": false, "alts": [], "addedLoad": false, "priority": 3}, {"id": "S6-08", "name": "Wrist flexor/pronator isometric (rehab, not counted)", "muscle": "none", "kind": "isolation", "sets": 3, "repLo": 1, "repHi": 1, "restSec": 45, "incr": 0, "technique": "30-45 s hold at moderate effort, elbow slightly bent", "cue": "Pain ≤ 3/10. Progress to 3 s eccentrics when pain-free", "elbowNote": "Golfer's elbow rehab: loads the tendon so it adapts", "credit": {}, "elbow": true, "alts": [], "addedLoad": false, "priority": 3}]}, {"id": "F1", "day": "mon", "title": "Fallback 1", "subtitle": "Full body", "slotMin": 60, "focus": ["chest", "back", "quads"], "exercises": [{"id": "F1-01", "name": "Incline DB press", "muscle": "chest", "kind": "compound", "sets": 3, "repLo": 6, "repHi": 10, "restSec": 150, "incr": 5, "technique": "", "cue": "Semi-neutral grip", "elbowNote": "", "credit": {"chest": 1, "triceps": 0.5}, "elbow": false, "alts": [], "addedLoad": false, "priority": 1}, {"id": "F1-02", "name": "Neutral-grip lat pulldown", "muscle": "back", "kind": "compound", "sets": 3, "repLo": 8, "repHi": 12, "restSec": 120, "incr": 5, "technique": "", "cue": "Straps on", "elbowNote": "", "credit": {"back": 1, "biceps": 0.5}, "elbow": false, "alts": [], "addedLoad": false, "priority": 1}, {"id": "F1-03", "name": "Hack squat or leg press", "muscle": "quads", "kind": "compound", "sets": 2, "repLo": 8, "repHi": 12, "restSec": 120, "incr": 10, "technique": "", "cue": "", "elbowNote": "", "credit": {"quads": 1}, "elbow": false, "alts": [], "addedLoad": false, "priority": 1}, {"id": "F1-04", "name": "Seated leg curl", "muscle": "hamsglutes", "kind": "isolation", "sets": 2, "repLo": 8, "repHi": 12, "restSec": 90, "incr": 5, "technique": "", "cue": "", "elbowNote": "", "credit": {"hamsglutes": 1}, "elbow": false, "alts": [], "addedLoad": false, "priority": 2}, {"id": "F1-05", "name": "Cable lateral raise", "muscle": "delts", "kind": "isolation", "sets": 2, "repLo": 12, "repHi": 20, "restSec": 60, "incr": 2.5, "technique": "", "cue": "", "elbowNote": "", "credit": {"delts": 1}, "elbow": false, "alts": [], "addedLoad": false, "priority": 2}, {"id": "F1-06", "name": "Overhead rope extension", "muscle": "triceps", "kind": "isolation", "sets": 2, "repLo": 10, "repHi": 15, "restSec": 75, "incr": 5, "technique": "", "cue": "", "elbowNote": "", "credit": {"triceps": 1}, "elbow": true, "alts": [], "addedLoad": false, "priority": 2}, {"id": "F1-07", "name": "Incline DB curl", "muscle": "biceps", "kind": "isolation", "sets": 2, "repLo": 8, "repHi": 12, "restSec": 75, "incr": 5, "technique": "", "cue": "", "elbowNote": "Wrist neutral", "credit": {"biceps": 1}, "elbow": true, "alts": [], "addedLoad": false, "priority": 2}, {"id": "F1-08", "name": "Standing calf raise", "muscle": "calves", "kind": "isolation", "sets": 2, "repLo": 8, "repHi": 12, "restSec": 60, "incr": 10, "technique": "", "cue": "", "elbowNote": "", "credit": {"calves": 1}, "elbow": false, "alts": [], "addedLoad": false, "priority": 2}]}, {"id": "F2", "day": "wed", "title": "Fallback 2", "subtitle": "Full body, dips", "slotMin": 60, "focus": ["chest", "back", "hamsglutes"], "exercises": [{"id": "F2-01", "name": "Dip, chest lean", "muscle": "chest", "kind": "compound", "sets": 3, "repLo": 8, "repHi": 12, "restSec": 120, "incr": 5, "technique": "", "cue": "Lean forward, elbows ~45°, lower until the upper arm is just below parallel or the shoulder says stop", "elbowNote": "Load = added lb", "credit": {"chest": 1, "triceps": 0.5}, "elbow": false, "alts": [], "addedLoad": true, "priority": 1}, {"id": "F2-02", "name": "Chest-supported row", "muscle": "back", "kind": "compound", "sets": 3, "repLo": 8, "repHi": 12, "restSec": 120, "incr": 5, "technique": "", "cue": "Straps on", "elbowNote": "", "credit": {"back": 1, "biceps": 0.5}, "elbow": false, "alts": [], "addedLoad": false, "priority": 1}, {"id": "F2-03", "name": "Leg press", "muscle": "quads", "kind": "compound", "sets": 2, "repLo": 10, "repHi": 15, "restSec": 120, "incr": 10, "technique": "", "cue": "", "elbowNote": "", "credit": {"quads": 1}, "elbow": false, "alts": [], "addedLoad": false, "priority": 1}, {"id": "F2-04", "name": "DB Romanian deadlift", "muscle": "hamsglutes", "kind": "compound", "sets": 2, "repLo": 8, "repHi": 10, "restSec": 120, "incr": 5, "technique": "", "cue": "RIR 2 floor", "elbowNote": "", "credit": {"hamsglutes": 1}, "elbow": false, "alts": [], "addedLoad": false, "priority": 2}, {"id": "F2-05", "name": "Lean-away lateral raise", "muscle": "delts", "kind": "isolation", "sets": 2, "repLo": 12, "repHi": 20, "restSec": 60, "incr": 2.5, "technique": "", "cue": "", "elbowNote": "", "credit": {"delts": 1}, "elbow": false, "alts": [], "addedLoad": false, "priority": 2}, {"id": "F2-06", "name": "Rope pressdown", "muscle": "triceps", "kind": "isolation", "sets": 2, "repLo": 12, "repHi": 20, "restSec": 60, "incr": 5, "technique": "", "cue": "", "elbowNote": "", "credit": {"triceps": 1}, "elbow": true, "alts": [], "addedLoad": false, "priority": 2}, {"id": "F2-07", "name": "Cable hammer curl", "muscle": "biceps", "kind": "isolation", "sets": 2, "repLo": 10, "repHi": 15, "restSec": 60, "incr": 5, "technique": "", "cue": "", "elbowNote": "", "credit": {"biceps": 1}, "elbow": true, "alts": [], "addedLoad": false, "priority": 2}, {"id": "F2-08", "name": "Seated calf raise", "muscle": "calves", "kind": "isolation", "sets": 2, "repLo": 10, "repHi": 15, "restSec": 60, "incr": 10, "technique": "", "cue": "", "elbowNote": "", "credit": {"calves": 1}, "elbow": false, "alts": [], "addedLoad": false, "priority": 2}]}, {"id": "F3", "day": "fri", "title": "Fallback 3", "subtitle": "Full body", "slotMin": 60, "focus": ["chest", "biceps", "triceps"], "exercises": [{"id": "F3-01", "name": "Low-incline machine press", "muscle": "chest", "kind": "compound", "sets": 2, "repLo": 8, "repHi": 12, "restSec": 120, "incr": 5, "technique": "", "cue": "", "elbowNote": "", "credit": {"chest": 1, "triceps": 0.5}, "elbow": false, "alts": [], "addedLoad": false, "priority": 1}, {"id": "F3-02", "name": "Cable fly", "muscle": "chest", "kind": "isolation", "sets": 2, "repLo": 12, "repHi": 20, "restSec": 75, "incr": 5, "technique": "", "cue": "", "elbowNote": "", "credit": {"chest": 1}, "elbow": false, "alts": [], "addedLoad": false, "priority": 1}, {"id": "F3-03", "name": "Single-arm cable pulldown", "muscle": "back", "kind": "isolation", "sets": 2, "repLo": 10, "repHi": 15, "restSec": 75, "incr": 5, "technique": "", "cue": "", "elbowNote": "", "credit": {"back": 1}, "elbow": false, "alts": [], "addedLoad": false, "priority": 1}, {"id": "F3-04", "name": "Chest-supported row", "muscle": "back", "kind": "compound", "sets": 1, "repLo": 10, "repHi": 15, "restSec": 90, "incr": 5, "technique": "", "cue": "Straps on", "elbowNote": "", "credit": {"back": 1, "biceps": 0.5}, "elbow": false, "alts": [], "addedLoad": false, "priority": 2}, {"id": "F3-05", "name": "Leg extension", "muscle": "quads", "kind": "isolation", "sets": 2, "repLo": 12, "repHi": 20, "restSec": 75, "incr": 5, "technique": "", "cue": "", "elbowNote": "", "credit": {"quads": 1}, "elbow": false, "alts": [], "addedLoad": false, "priority": 2}, {"id": "F3-06", "name": "Seated leg curl", "muscle": "hamsglutes", "kind": "isolation", "sets": 2, "repLo": 10, "repHi": 15, "restSec": 75, "incr": 5, "technique": "", "cue": "", "elbowNote": "", "credit": {"hamsglutes": 1}, "elbow": false, "alts": [], "addedLoad": false, "priority": 2}, {"id": "F3-07", "name": "Reverse pec deck", "muscle": "delts", "kind": "isolation", "sets": 2, "repLo": 15, "repHi": 20, "restSec": 45, "incr": 5, "technique": "", "cue": "", "elbowNote": "", "credit": {"delts": 1}, "elbow": false, "alts": [], "addedLoad": false, "priority": 2}, {"id": "F3-08", "name": "Cable Bayesian curl", "muscle": "biceps", "kind": "isolation", "sets": 2, "repLo": 10, "repHi": 15, "restSec": 60, "incr": 2.5, "technique": "", "cue": "", "elbowNote": "Wrist neutral", "credit": {"biceps": 1}, "elbow": true, "alts": [], "addedLoad": false, "priority": 2}, {"id": "F3-09", "name": "Overhead cable extension", "muscle": "triceps", "kind": "isolation", "sets": 2, "repLo": 10, "repHi": 15, "restSec": 60, "incr": 2.5, "technique": "", "cue": "", "elbowNote": "", "credit": {"triceps": 1}, "elbow": true, "alts": [], "addedLoad": false, "priority": 2}, {"id": "F3-10", "name": "Leg press calf raise", "muscle": "calves", "kind": "isolation", "sets": 2, "repLo": 10, "repHi": 15, "restSec": 60, "incr": 10, "technique": "", "cue": "", "elbowNote": "", "credit": {"calves": 1}, "elbow": false, "alts": [], "addedLoad": false, "priority": 2}]}], "evidence": [{"id": "e01", "topic": "Volume", "claim": "Hypertrophy rises with weekly sets, ~10+ per muscle; diminishing returns at high volumes.", "url": "https://doi.org/10.1080/02640414.2016.1210197", "verified": true, "source": "Schoenfeld, Ogborn, Krieger 2017, J Sports Sci (meta-analysis)"}, {"id": "e02", "topic": "Volume counting", "claim": "Indirect sets counted at 0.5 best predicted growth; frequency matters little once volume is matched.", "url": "https://pubmed.ncbi.nlm.nih.gov/41343037/", "verified": true, "source": "Pelland et al. 2026, Sports Med (meta-regression)"}, {"id": "e03", "topic": "Proximity to failure", "claim": "Training to failure gives at most a small hypertrophy edge over stopping a few reps short.", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9935748/", "verified": true, "source": "Refalo et al. 2023, Sports Med"}, {"id": "e11", "topic": "Maintenance dose", "claim": "One-third of the training dose kept muscle size in young adults; older adults needed more.", "url": "https://pubmed.ncbi.nlm.nih.gov/21131862/", "verified": true, "source": "Bickel, Cross, Bamman 2011, MSSE"}, {"id": "e12", "topic": "Time-efficient training", "claim": "Supersets and reduced-volume sessions retain adaptations; ~4 sets/wk floor.", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8449772/", "verified": true, "source": "Iversen et al. 2021, Sports Med"}, {"id": "e13", "topic": "Deloads", "claim": "Consensus: cut volume, keep intensity; timing is individual.", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10511399/", "verified": true, "source": "Bell et al. 2023, Sports Med Open (Delphi)"}, {"id": "e14", "topic": "RIR scale", "claim": "Reps-in-reserve rating is a usable intensity gauge in trained lifters.", "url": "https://doi.org/10.1519/JSC.0000000000001049", "verified": true, "source": "Zourdos et al. 2016, JSCR"}, {"id": "e15", "topic": "Range of motion", "claim": "Long-muscle-length and full ROM training favour several muscles.", "url": "https://pubmed.ncbi.nlm.nih.gov/36662126/", "verified": true, "source": "Kassiano et al. 2023, JSCR (systematic review)"}, {"id": "e16", "topic": "Concurrent training", "claim": "Walking-style cardio does not blunt hypertrophy; separate by 3 h for explosive work.", "url": "https://pubmed.ncbi.nlm.nih.gov/34757594/", "verified": true, "source": "Schumann et al. 2022, Sports Med"}, {"id": "e18", "topic": "Steps", "claim": "Mortality risk falls with steps up to ~8-10k/day in adults under 60.", "url": "https://pubmed.ncbi.nlm.nih.gov/35247352/", "verified": true, "source": "Paluch et al. 2022, Lancet Public Health"}, {"id": "e21", "topic": "Overhead triceps", "claim": "Overhead extension grew the triceps more than neutral-arm pressdowns (small, untrained sample).", "url": "", "verified": false, "source": "Maeo et al. 2022, Eur J Sport Sci (no DOI retrieved)"}, {"id": "e22", "topic": "Elbow pain rule", "claim": "Pain-monitoring model adapted from Achilles tendinopathy; elbow use is an extrapolation.", "url": "https://doi.org/10.1177/0363546506298279", "verified": false, "source": "Silbernagel et al. 2007, AJSM (extrapolated)"}, {"id": "e23", "topic": "Program design", "claim": "Week multipliers, RIR ramp, 97/93% lines and trim order are panel design, not trial-tested.", "url": "", "verified": false, "source": "Panel design"}, {"id": "e24", "topic": "Golfer's elbow rehab", "claim": "Progressive flexor/pronator loading (isometric, then eccentric) improved pain and function in small studies; low-moderate evidence.", "url": "", "verified": false, "source": "2026 systematic review, abstract only"}, {"id": "e25", "topic": "Elbow grips", "claim": "Neutral-grip and strap advice for golfer's elbow is coaching practice, not trial-tested.", "url": "", "verified": false, "source": "Coaching practice"}]};
+(function(){
+"use strict";
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const META = PLAN.meta, WEEKS = PLAN.weeks, SESS = Object.fromEntries(PLAN.sessions.map(s=>[s.id,s]));
+const EXBYID = {}; PLAN.sessions.forEach(s=>s.exercises.forEach(e=>{ EXBYID[e.id]=e; (e.variants||[]).forEach(v=>{ if(v) EXBYID[v.id]=Object.assign({}, e, v, {variants:null, rotate:null, baseId:e.id}); }); }));
+// Rotation: "block" = version A in weeks 1-4 and 9-12, B in 5-8 and 13-16; "week" = odd weeks A, even weeks B.
+function resolveEx(e, w){
+  let r = e;
+  if(e.variants){ const i = e.rotate === "week" ? (w % 2 === 0 ? 1 : 0) : (Math.floor((Math.max(1,w)-1)/4) % 2); const v = e.variants[i]; if(v) r = EXBYID[v.id]; }
+  // Techniques switch with the block: version A in weeks 1-4 and 9-12, B in 5-8 and 13-16.
+  if(r.techniqueB && Math.floor((Math.max(1,w)-1)/4) % 2 === 1) r = Object.assign({}, r, { technique: r.techniqueB });
+  return r;
+}
+// Superset / giant-set labels: A1, A2, A3 by order within the session.
+function groupLabels(list){ const n = {}; return Object.fromEntries(list.map(e => [e.id, e.group ? e.group + (n[e.group] = (n[e.group]||0) + 1) : ""])); }
+const DOW = ["sun","mon","tue","wed","thu","fri","sat"], DOWL = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const MUSCLE_KEYS = Object.keys(META.muscles);
+
+// ---------- dates ----------
+const pad = n => String(n).padStart(2,"0");
+const isoLocal = (d=new Date()) => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const dayNum = iso => { const [y,m,d] = iso.split("-").map(Number); return Math.round(Date.UTC(y,m-1,d)/864e5); };
+const fromDayNum = n => { const d = new Date(n*864e5); return `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}`; };
+const dowOf = iso => new Date(dayNum(iso)*864e5).getUTCDay();
+const START = dayNum(META.startDate);
+const weekOf = iso => Math.floor((dayNum(iso)-START)/7)+1; // <1 means before start
+const weekPlan = w => WEEKS[Math.min(16,Math.max(1,w))-1];
+const fmtDate = iso => { const d = new Date(dayNum(iso)*864e5); return d.toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short",timeZone:"UTC"}); };
+const wk = w => "w"+pad(w);
+
+// ---------- store ----------
+let db=null, dbState="connecting", userApi=null, dl=null, ready=null, me=null;
+const data = { app:null, logs:{}, people:{}, partnerLogs:{} };
+// Shared two-person store: people/<id> holds each person's state, people/<id>/logs their sessions.
+// Rules: everyone admitted reads people/, each person writes only their own subtree.
+const myPath = rest => `people/${me}${rest ? "/" + rest : ""}`;
+const queues = {};
+async function save(path, body){ // one write at a time per doc; latest body wins
+  if(!db && ready) await ready;
+  if(!db){ setSaveError(path, "no_store"); return false; }
+  const q = queues[path] || (queues[path] = {busy:false, next:null, waiters:[]});
+  q.next = JSON.parse(JSON.stringify(body));
+  return new Promise(res => { q.waiters.push(res); if(!q.busy) pump(path); });
+}
+async function pump(path){
+  const q = queues[path]; q.busy = true;
+  while(q.next){
+    const body = q.next; q.next = null; const waiters = q.waiters.splice(0);
+    let ok = false;
+    for(let a=0;a<2 && !ok;a++){
+      try{ await db.doc(path).set(body); ok = true; }
+      catch(e){ if(e && e.code==="unavailable" && a===0){ await new Promise(r=>setTimeout(r,400+Math.random()*600)); continue; }
+        console.warn("save failed", path, e); setSaveError(path, e); break; }
+    }
+    if(ok) clearSaveError(path);
+    waiters.forEach(w=>w(ok));
+  }
+  q.busy = false;
+}
+const saveErrors = {};
+function setSaveError(p,e){ saveErrors[p] = (e && e.code) || "error"; render(); }
+function clearSaveError(p){ if(saveErrors[p]){ delete saveErrors[p]; render(); } }
+
+async function connect(){
+  try{ db = await window.claude?.use?.("db") ?? null; }catch(e){ db = null; }
+  try{ userApi = await window.claude?.use?.("user") ?? null; }catch(e){ userApi = null; }
+  try{ dl = await window.claude?.use?.("downloads") ?? null; }catch(e){ dl = null; }
+  try{ me = userApi ? await userApi.id() : null; }catch(e){ me = null; }
+  if(!db || !me){ db = null; dbState = "offline"; restoreLocal(); render(); return; }
+  dbState = "live";
+  const onErr = e => { console.warn("subscription ended", e); dbState = "error"; render(); };
+  const subscribed = new Set(); let created = false;
+  db.collection("people").onSnapshot(s => {
+    data.people = Object.fromEntries(s.docs.map(d=>[d.id,d.data()]));
+    data.app = data.people[me] || data.app;
+    if(!data.people[me] && !created){ created = true;
+      db.doc(myPath()).get().then(d => { if(!d.exists) save(myPath(), { weekMode:{}, joinedAt: Date.now() }); }).catch(e => console.warn("profile check failed", e)); }
+    Object.keys(data.people).concat([me]).forEach(uid => { if(subscribed.has(uid)) return; subscribed.add(uid);
+      db.collection(`people/${uid}/logs`).orderBy("date","desc").limit(400).onSnapshot(q => {
+        const logs = Object.fromEntries(q.docs.map(d=>[d.id,d.data()]));
+        if(uid === me){ data.logs = logs; syncActive(); } else data.partnerLogs[uid] = logs;
+        render(); }, onErr); });
+    render();
+  }, onErr);
+  render();
+}
+function restoreLocal(){ /* view-only fallback: nothing persists without the store */ }
+
+// ---------- derived ----------
+const appState = () => Object.assign({ weekMode:{} }, data.app || {});
+function saveApp(patch){ const next = Object.assign({}, appState(), patch); data.app = next; render(); return save(myPath(), next); }
+const todayIso = () => isoLocal();
+function modeFor(w){ return appState().weekMode[wk(w)] || "standard"; }
+function weekLogs(w){ return Object.values(data.logs).filter(l => l.week === w); }
+function sessionFor(iso){
+  const w = Math.max(1, weekOf(iso));
+  if(modeFor(w) === "fallback"){
+    const done = weekLogs(w).filter(l => l.finishedAt);
+    const today = done.find(l => l.date === iso && /^F/.test(l.sessionId)); if(today) return today.sessionId;
+    if(dayNum(iso) > dayNum(todayIso())) return null;
+    return META.schedule.fallback.find(id => !done.some(l => l.sessionId === id)) || null;
+  }
+  return META.schedule.standard[DOW[dowOf(iso)]] || null;
+}
+function logsOn(iso){ return Object.values(data.logs).filter(l => l.date === iso); }
+function setsFor(ex, w, readiness, short){
+  const mult = weekPlan(w).setsMult; let n = Math.max(1, Math.round(ex.sets * mult));
+  if(short) return Math.min(n, 3);
+  if(readiness && readiness.band !== "green") n = Math.max(1, n-1);
+  return n;
+}
+const sessExercises = (s, log) => { const w = Math.max(1, log?.week || 1); let list = s.exercises;
+  if(log && log.short){ const p = list.filter(e => e.priority === 1); list = p.length ? p : list.slice(0,3); }
+  return list.map(e => resolveEx(e, w)); };
+function rirTarget(ex, w){
+  const wp = weekPlan(w); if(ex.kind === "power") return "3+"; let r = ex.kind === "compound" ? wp.rirCompound : wp.rirIsolation;
+  if(ex.kind !== "compound" && ex.elbow){ r = r.replace(/\d/g, d => String(Math.min(4, Math.max(2, +d + META.elbowRirOffset)))); if(/^(\d)-\1$/.test(r)) r = r[0]; }
+  if(/^4\+?$/.test(r) || r === "4+") return "4+";
+  return r;
+}
+const rirMid = r => { const n = (r.match(/\d/g)||["2"]).map(Number); return Math.min(4, Math.round(n.reduce((a,b)=>a+b,0)/n.length)); };
+function estMin(s){ // grouped exercises rest once per round, plus 15 s to change stations
+  let t = META.warmupMin*60; const seen = new Set();
+  s.exercises.forEach(e => { t += e.sets*META.workSec*(e.perSide?2:1);
+    if(!e.group){ t += e.sets*e.restSec; return; } if(seen.has(e.group)) return; seen.add(e.group);
+    const m = s.exercises.filter(x => x.group === e.group); t += Math.max(...m.map(x=>x.sets)) * (Math.max(...m.map(x=>x.restSec)) + 15*(m.length-1)); });
+  return Math.round(t/60);
+}
+
+function setsByMuscle(w){
+  const t = Object.fromEntries(MUSCLE_KEYS.map(m=>[m,0]));
+  Object.values(data.logs).filter(l => l.week === w).forEach(l => {
+    Object.entries(l.exercises || {}).forEach(([id, ex]) => {
+      if(ex.skipped) return; const pe = EXBYID[id]; if(!pe) return;
+      if((ex.fin || []).some(f => f.reps > 0)) Object.entries(pe.credit).forEach(([m,c]) => { if(m in t) t[m] += c; });
+      Object.values(ex.sets || {}).forEach(s => { if(s.reps > 0 && (s.rir == null || s.rir <= META.hardSetMaxRir))
+        Object.entries(pe.credit).forEach(([m,c]) => { if(m in t) t[m] += c; }); });
+    });
+  });
+  return t;
+}
+function targetsFor(w){
+  const fb = modeFor(w) === "fallback", mult = weekPlan(w).setsMult, src = fb ? META.fallbackMuscles : META.muscles;
+  return Object.fromEntries(MUSCLE_KEYS.map(m => [m, { lo: Math.round(src[m].lo * (fb?1:mult)), hi: Math.round(src[m].hi * (fb?1:mult)) }]));
+}
+// ---------- UI state ----------
+let tab = "today", planSeg = "weeks", progWeek = null, activeId = null, cur = null, restEnd = 0, restTotal = 0, timerHandle = null, lastSaved = null, toastTimer = null, wakeLock = null;
+try{ const t = localStorage.getItem("v9-theme"); if(t) document.documentElement.dataset.theme = t; }catch(e){}
+
+function toast(msg, action){
+  const host = $("#toast-host"); clearTimeout(toastTimer);
+  host.innerHTML = `<div class="toast" role="status"><span>${esc(msg)}</span>${action?`<button id="toast-act">${esc(action.label)}</button>`:""}</div>`;
+  if(action) $("#toast-act").onclick = () => { host.innerHTML=""; action.fn(); };
+  toastTimer = setTimeout(()=>host.innerHTML="", action ? 5000 : 2600);
+}
+
+// ---------- tabs ----------
+const ICONS = {
+  today:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+  log:'<svg viewBox="0 0 24 24"><path d="M2 12h3M19 12h3M5 8v8M19 8v8M8 6v12M16 6v12M8 12h8"/></svg>',
+  progress:'<svg viewBox="0 0 24 24"><path d="M3 20h18"/><path d="M4 15l5-5 4 3 7-8"/></svg>',
+  plan:'<svg viewBox="0 0 24 24"><path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>'
+};
+const TABS = [["today","Today"],["log","Log"],["progress","Progress"],["plan","Plan"]];
+function renderTabs(){
+  const open = activeLog();
+  $("#tabs").innerHTML = TABS.map(([k,l]) => `<button data-tab="${k}" ${tab===k?'aria-current="page"':''}>${ICONS[k]}<span>${l}</span>${k==="log"&&open?'<i class="dot" aria-label="session in progress"></i>':''}</button>`).join("");
+  $("#tabs").querySelectorAll("button").forEach(b => b.onclick = () => { tab = b.dataset.tab; if(tab==="log" && activeLog()) activeId = activeLog().id; render(); scrollTo(0,0); });
+}
+function activeLog(){ const l = Object.entries(data.logs).find(([id,l]) => l.startedAt && !l.finishedAt && l.date >= fromDayNum(dayNum(todayIso())-1)); return l ? Object.assign({id:l[0]}, l[1]) : null; }
+// The device running a session owns it: snapshots never overwrite the live copy, or a late echo could drop a set.
+function syncActive(){ if(activeId && !cur && data.logs[activeId]) cur = JSON.parse(JSON.stringify(data.logs[activeId])); if(activeId && cur) data.logs[activeId] = JSON.parse(JSON.stringify(cur)); }
+
+// ---------- render root ----------
+function render(){
+  renderTabs();
+  document.body.classList.toggle("logging", tab==="log" && !!activeId && !!cur && !cur.finishedAt);
+  const m = $("#app");
+  const banner = dbState==="offline" ? `<div class="banner danger"><p><b>Nothing will save right now.</b> This copy of the app isn't signed in to claude.ai, so it can't tell whose log this is. On iPhone, a Home Screen app keeps its own login, separate from Safari: sign in to claude.ai inside it, or use the page in Safari. You can still read the plan.</p></div>`
+    : dbState==="error" ? `<div class="banner danger"><p><b>Lost the connection to your data.</b> Reload the page to reconnect.</p></div>` : "";
+  const errs = Object.keys(saveErrors).length ? `<div class="banner danger"><p class="err">${Object.values(saveErrors).includes("no_store")?"Not saved: this copy can't reach your data. Sign in to claude.ai here, then save again.":"Some changes didn't save. Tap Retry."}</p><button class="btn sm" id="retry">Retry</button></div>` : "";
+  m.innerHTML = banner + errs + ({today:viewToday, log:viewLog, progress:viewProgress, plan:viewPlan}[tab])();
+  const r = $("#retry"); if(r) r.onclick = () => { Object.keys(saveErrors).forEach(p => { delete saveErrors[p]; if(p.includes("/logs/") && cur) persistCur(); }); render(); };
+  ({today:bindToday, log:bindLog, progress:bindProgress, plan:bindPlan}[tab])();
+}
+
+// ---------- TODAY ----------
+function viewToday(){
+  const iso = todayIso(), w = weekOf(iso), pre = w < 1, wp = weekPlan(w), mode = modeFor(Math.max(1,w));
+  const trainedToday = logsOn(iso).find(l => l.finishedAt);
+  const sid = pre ? null : (mode === "fallback" && trainedToday ? trainedToday.sessionId : sessionFor(iso)), s = sid ? SESS[sid] : null, done = logsOn(iso).find(l => l.sessionId === sid && l.finishedAt);
+  const open = activeLog();
+  const head = `<header class="row between"><div class="grow"><p class="eyebrow">${esc(fmtDate(iso))}</p><h1>${pre ? "Cut starts Monday" : `Week ${w} <span class="muted">of 16</span>`}</h1></div>
+    <div class="row">${pre ? `<span class="pill pre">Pre-start</span>` : `<span class="pill ${wp.phase}">${esc(wp.label === "Diet break" ? "Diet break" : wp.phase==="deload"?"Deload":"Cut")}</span>`}${mode==="fallback"&&!pre?`<span class="pill fallback">Fallback</span>`:""}</div></header>`;
+  let hero;
+  if(open){
+    const s2 = SESS[open.sessionId]; const n = Object.values(open.exercises||{}).filter(e=>Object.keys(e.sets||{}).length).length;
+    hero = `<section class="card"><p class="eyebrow">In progress</p><h2>${esc(s2.title)}</h2><p class="muted">${n} of ${s2.exercises.length} exercises started</p><button class="btn primary big" data-resume="${open.id}">Resume</button></section>`;
+  } else if(pre){
+    const first = SESS.S1;
+    hero = `<section class="card"><p class="eyebrow">Monday ${esc(fmtDate(META.startDate))}</p><h2>Week 1 opens with ${esc(first.title)}</h2>
+      <p class="muted small">Week 1 is calibration: 80% volume, 3 reps in reserve on compounds. You're finding working loads, not testing them.</p>
+      <button class="btn" data-start="S1">Preview and log ${esc(first.title)} now</button></section>`;
+  } else if(s && !done){
+    hero = `<section class="card"><p class="eyebrow">${mode==="fallback"?"Fallback week · any 3 days, not back-to-back":"Today · "+esc(DOWL[dowOf(iso)])}</p><h2>${esc(s.title)}</h2><p class="muted">${esc(s.subtitle)} · ${s.exercises.length} exercises · about ${estMin(s)} min</p>
+      ${wp.phase==="deload"?`<p class="small"><b>Deload week:</b> same exercises, half the sets, stop with 4+ reps in reserve.</p>`:META.finisherWeeks.includes(w)?`<p class="small"><b>Build week:</b> last-set finishers are on for marked lifts.</p>`:""}
+      <div class="grid2"><button class="btn primary big" data-start="${sid}" style="grid-column:1/-1">Start</button></div>
+      <button class="btn sm" data-short="${sid}">30-minute version: priority lifts, 3 sets each</button></section>`;
+  } else if(s && done){
+    hero = `<section class="card"><p class="eyebrow">Today</p><h2>${esc(s.title)} done</h2>${sessionSummary(done, iso)}</section>`;
+  } else {
+    const next = nextSession(iso);
+    hero = `<section class="card"><p class="eyebrow">Rest day</p><h2>Walk and recover</h2><p class="muted">Steps target ${wp.steps.toLocaleString()}. ${next?`Next: ${esc(DOWL[dowOf(next.iso)])} ${esc(SESS[next.sid].title)}.`:""}</p>
+      <details><summary>Train anyway</summary><div class="row">${(mode==="fallback"?META.schedule.fallback:Object.values(META.schedule.standard).filter(Boolean)).map(id=>`<button class="btn sm" data-start="${id}">${esc(SESS[id].title)}</button>`).join("")}</div></details></section>`;
+  }
+  const banners = todayBanners(iso, w, pre);
+  const tgt = `<section class="card"><h3>Cardio</h3><div class="grid2">
+    <div class="kpi"><span class="l">Steps</span><span class="v">${(wp.steps/1000).toFixed(wp.steps%1000?1:0)}k</span><span class="d">7-day avg</span></div>
+    <div class="kpi"><span class="l">Incline walks</span><span class="v">${esc(wp.incline.split(" ×")[0])}×</span><span class="d">this week</span></div></div>
+    <p class="small muted">${esc(wp.incline)}</p></section>`;
+  return head + banners + hero + tgt + (pre ? "" : weekDots(w));
+}
+function sessionSummary(l, iso){
+  const ex = Object.entries(l.exercises||{}), sets = ex.reduce((a,[,e]) => a + Object.keys(e.sets||{}).length, 0), fins = ex.filter(([,e]) => (e.fin||[]).length).length;
+  const prs = ex.filter(([,e]) => Object.values(e.sets||{}).some(st => st.pr)).map(([id,e]) => e.swappedTo || e.name || EXBYID[id]?.name);
+  const mins = l.finishedAt && l.startedAt ? Math.round((l.finishedAt - l.startedAt)/60000) : null, next = nextSession(iso);
+  return `<div class="grid3"><div class="kpi"><span class="l">Sets</span><span class="v">${sets}</span></div><div class="kpi"><span class="l">Minutes</span><span class="v">${mins ?? "–"}</span></div><div class="kpi"><span class="l">PRs</span><span class="v">${prs.length}</span></div></div>
+    ${prs.length ? `<p class="small"><b>New bests:</b> ${prs.map(n => esc(shortName(n))).join(", ")}</p>` : ""}${fins ? `<p class="small muted">${fins} finisher${fins>1?"s":""} logged.</p>` : ""}
+    <p class="small muted">Next: ${next ? `${esc(DOWL[dowOf(next.iso)])} · ${esc(SESS[next.sid].title)}` : "rest"}. Hit your steps.</p>`;
+}
+function nextSession(iso){ for(let i=1;i<=7;i++){ const d = fromDayNum(dayNum(iso)+i); const sid = sessionFor(d); if(sid) return {iso:d, sid}; } return null; }
+function todayBanners(iso, w, pre){
+  let out = ""; if(pre) return out;
+  const dow = dowOf(iso), mode = modeFor(w);
+  if(mode === "standard" && (dow >= 3 || dow === 0)){
+    let missed = 0; const monday = START + (w-1)*7;
+    for(let i=0;i<7;i++){ const d = fromDayNum(monday+i); if(dayNum(d) >= dayNum(iso)) break; const sid = sessionFor(d); if(sid && !logsOn(d).some(l=>l.finishedAt)) missed++; }
+    if(missed >= 2) out += `<div class="banner"><p><b>${missed} sessions missed this week.</b> The plan says switch to the 3-day fallback for the rest of the week. No catch-up sessions.</p><button class="btn sm" data-fallback="${w}">Switch this week to fallback</button></div>`;
+  }
+  if(mode === "fallback" && dow === 1 && modeFor(w-1) === "fallback") out += `<div class="banner info"><p>Last week was fallback. Return to the full week if you have 5+ sessions available this week.</p></div>`;
+  return out;
+}
+function weekDots(w){
+  const monday = START + (w-1)*7, today = dayNum(todayIso());
+  return `<section class="card"><div class="row between"><h3>This week</h3><button class="btn ghost sm" data-goto="progress">Sets by muscle</button></div><div class="dots">` +
+    [1,2,3,4,5,6,0].map((dw,i) => { const d = fromDayNum(monday+i), done = logsOn(d).some(l=>l.finishedAt);
+      const sid = modeFor(w)==="fallback" ? (logsOn(d).find(l=>l.finishedAt)?.sessionId || (dayNum(d)===today ? sessionFor(d) : null)) : sessionFor(d);
+      const fb = modeFor(w)==="fallback"; const cls = [done?"done":"", !sid?"rest":"", dayNum(d)===today?"today":"", (!fb && sid && !done && dayNum(d)<today)?"miss":""].join(" ");
+      return `<div class="${cls}"><span>${sid?esc(sid):"–"}</span>${DOWL[dw]}</div>`; }).join("") + `</div></section>`;
+}
+function bindToday(){
+  document.querySelectorAll("[data-start]").forEach(b => b.onclick = () => openStart(b.dataset.start));
+  document.querySelectorAll("[data-short]").forEach(b => b.onclick = () => openStart(b.dataset.short, true));
+  document.querySelectorAll("[data-resume]").forEach(b => b.onclick = () => { activeId = b.dataset.resume; cur = JSON.parse(JSON.stringify(data.logs[activeId])); tab="log"; render(); });
+  document.querySelectorAll("[data-goto]").forEach(b => b.onclick = () => { tab = b.dataset.goto; render(); scrollTo(0,0); });
+  document.querySelectorAll("[data-fallback]").forEach(b => b.onclick = () => { const m = Object.assign({}, appState().weekMode, {[wk(+b.dataset.fallback)]:"fallback"}); saveApp({weekMode:m}); toast("This week is now the 3-day fallback."); });
+}
+const num = v => { const n = parseFloat(String(v).replace(",", ".")); return isFinite(n) ? n : null; };
+// ---------- START + READINESS ----------
+function openStart(sid, short){ tab = "log"; activeId = null; cur = null; exIdx = 0; beginSession(sid, null, !!short); }
+async function beginSession(sid, readiness, short){
+  const iso = todayIso(), w = Math.max(1, weekOf(iso)), id = `${iso}-${sid}`;
+  const existing = data.logs[id];
+  cur = existing && !existing.finishedAt ? JSON.parse(JSON.stringify(existing)) : {
+    date: iso, sessionId: sid, week: weekOf(iso) < 1 ? 0 : w, mode: modeFor(w), phase: weekPlan(w).phase,
+    startedAt: Date.now(), finishedAt: null, readiness, short: !!short, exercises: {}, note: "", feeling: null };
+  if(existing && existing.finishedAt){ cur = JSON.parse(JSON.stringify(existing)); cur.finishedAt = null; }
+  activeId = id; data.logs[id] = cur; persistCur();
+  try{ if(navigator.wakeLock) wakeLock = await navigator.wakeLock.request("screen"); }catch(e){}
+  render(); scrollTo(0,0);
+}
+function persistCur(){ if(!cur || !activeId) return; data.logs[activeId] = JSON.parse(JSON.stringify(cur)); return save(myPath("logs/"+activeId), cur); }
+
+// ---------- LOG ----------
+let exIdx = 0, draft = null;
+function viewLog(){
+  if(!activeId || !cur){
+    const open = activeLog();
+    const recent = Object.entries(data.logs).filter(([,l])=>l.finishedAt).sort((a,b)=>b[1].date.localeCompare(a[1].date)).slice(0,8);
+    const iso = todayIso(), sid = sessionFor(iso);
+    return `<header><p class="eyebrow">Log</p><h1>Sessions</h1></header>
+      ${open?`<section class="card"><h3>${esc(SESS[open.sessionId].title)} in progress</h3><button class="btn primary big" data-resume="${open.id}">Resume</button></section>`:""}
+      <section class="card"><h3>Start a session</h3><p class="small muted">${sid?`Today's plan is ${esc(SESS[sid].title)}.`:"Today is a rest day on the plan."} Any session can be run on any day.</p>
+      <div class="grid2">${PLAN.sessions.map(s=>`<button class="btn ${s.id===sid?"primary":""}" data-start="${s.id}">${esc(s.id)} · ${esc(s.title)}</button>`).join("")}</div></section>
+      <section class="card"><h3>Recent</h3>${recent.length?recent.map(([id,l])=>`<div class="setrow"><span class="grow">${esc(fmtDate(l.date))} · ${esc(SESS[l.sessionId]?.title||l.sessionId)}</span><span class="muted small">${Object.values(l.exercises||{}).reduce((a,e)=>a+Object.keys(e.sets||{}).length,0)} sets</span></div>`).join(""):`<p class="empty">Finished sessions show up here.</p>`}</section>`;
+  }
+  const s = Object.assign({}, SESS[cur.sessionId]); s.exercises = sessExercises(SESS[cur.sessionId], cur); const w = Math.max(1, cur.week || 1);
+  exIdx = Math.min(exIdx, s.exercises.length-1);
+  const ex = s.exercises[exIdx], le = cur.exercises[ex.id] || {}, sets = le.sets || {}, nDone = Object.keys(sets).length;
+  const planned = setsFor(ex, w, cur.readiness, cur.short), target = rirTarget(ex, w);
+  const last = lastPerformance(ex.id, cur.date), hint = progressionHint(ex, last), mate = partnerLast(ex.id);
+  if(!draft || draft.ex !== ex.id || draft.n !== nDone+1) draft = prefill(ex, sets, last, target, nDone+1);
+  const elapsed = Math.round((Date.now() - cur.startedAt)/60000);
+  const GL = groupLabels(s.exercises);
+  const chips = s.exercises.map((e,i) => { const L = cur.exercises[e.id]; const c = (L?.skipped)?"skipped":(Object.keys(L?.sets||{}).length >= setsFor(e,w,cur.readiness,cur.short))?"done":""; return `<button class="chip ${i===exIdx?"active":c}" data-ex="${i}">${GL[e.id]?GL[e.id]+" ":i+1+". "}${esc(shortName(L?.swappedTo||e.name))}</button>`; }).join("");
+  const doneRows = Object.entries(sets).sort((a,b)=>a[0]-b[0]).map(([n,st]) => `<div class="setrow"><span class="n">Set ${n}</span><b>${st.load}</b>&nbsp;lb × <b>${st.reps}</b> <span class="muted">RIR ${st.rir===4?"4+":st.rir}</span>${st.pr?` <span class="tag s-ok">PR</span>`:""}<button class="x" data-del="${n}" aria-label="Delete set ${n}">×</button></div>`).join("");
+  const allDone = nDone >= planned;
+  const deload = weekPlan(w).phase === "deload";
+  return `<div class="logtop"><button class="btn ghost sm" id="l-back" aria-label="Back to Today">‹ Today</button><div class="grow"><b>${esc(s.title)}${cur.short?" · 30-min":""}</b> <span class="muted small">${elapsed} min</span></div><span class="muted small">${exIdx+1}/${s.exercises.length}</span></div>
+  ${cur.readiness && cur.readiness.band!=="green"?`<div class="banner ${cur.readiness.band==="red"?"danger":""}"><p class="small"><b>Readiness ${cur.readiness.band} (${cur.readiness.sum}/20).</b> One set dropped from each exercise${cur.readiness.band==="red"?"; consider the 30-minute minimum: priority muscles only, 3 exercises × 3 sets":""}.</p></div>`:""}
+  ${deload?`<div class="banner info"><p class="small"><b>Deload:</b> same exercises, fewer sets, stop with 4+ reps in reserve.</p></div>`:""}
+  <div class="strip" role="tablist" aria-label="Exercises">${chips}</div>
+  <section class="card">
+    ${ex.group ? `<div class="round" aria-label="This round">${groupMembers(s, ex).map(m => { const L2 = cur.exercises[m.id], d = Object.keys(L2?.sets||{}).length, p = setsFor(m, w, cur.readiness, cur.short), lp = lastPerformance(m.id, cur.date);
+      return `<button class="roundrow ${m.id===ex.id?"on":""}" data-ex="${s.exercises.indexOf(m)}"><b>${GL[m.id]}</b><span class="grow">${esc(shortName(L2?.swappedTo||m.name))}</span><span class="num muted small">${d}/${p}${lp?` · last ${lp.best.load}×${lp.best.reps}`:""}</span></button>`; }).join("")}</div>` : ""}
+    <div><p class="eyebrow">${esc(ex.muscle==="none"?"Health":META.muscles[ex.muscle]?.label||ex.muscle)} · ${ex.kind}</p><h2>${GL[ex.id]?`<span class="muted">${GL[ex.id]}</span> `:""}${esc(le.swappedTo||ex.name)}</h2>
+    <p class="num"><b>${planned} × ${ex.repLo}-${ex.repHi}</b>${ex.perSide?" per leg":""} @ RIR ${esc(target)} · ${ex.group?(groupNext(s, ex)?`then ${esc(GL[groupNext(s, ex).id])}, no rest`:`rest ${fmtRest(groupRest(s, ex))} after the round`):`rest ${fmtRest(ex.restSec)}`}</p>
+    ${ex.technique?`<p class="small"><b>Technique:</b> ${esc(ex.technique)}</p>`:""}</div>
+    ${finActive(ex, w) ? finisherBlock(ex, le, sets, nDone, planned) : ""}
+    <div class="row">${last?`<span class="tag muted num">Last: ${last.best.load} × ${last.best.reps} @${last.best.rir===4?"4+":last.best.rir} · ${esc(fmtDate(last.date))}</span>`:`<span class="tag s-info">First time: type your working weight, one you'd get ${ex.repHi} reps with at RIR ${esc(target)}</span>`}
+    ${hint?`<span class="tag s-ok">Try ${hint} lb</span>`:""}
+    ${mate?`<span class="tag s-info num">Partner: ${mate.best.load} × ${mate.best.reps} @${mate.best.rir===4?"4+":mate.best.rir} · ${esc(fmtDate(mate.date))}</span>`:""}</div>
+    ${doneRows?`<div>${doneRows}</div>`:""}
+    ${allDone?`<p class="saved">All ${planned} planned sets logged.${exIdx < s.exercises.length-1?" Moving on.":""}</p>`:""}
+    <div class="field"><span class="eyebrow">Set ${nDone+1}${allDone?" (extra)":""} · ${ex.addedLoad?"added load":"load"}</span>
+      <div class="stepper"><button data-step="load:-1" aria-label="Less load">−</button><input id="d-load" class="num${!last && !nDone && !draft.load ? " needs" : ""}" inputmode="decimal" value="${draft.load}" aria-label="Load in pounds"><button data-step="load:1" aria-label="More load">+</button><span class="unit">lb${ex.addedLoad?" added (0 = bodyweight)":""} · step ${ex.incr||1}</span></div></div>
+    <div class="field"><span class="eyebrow">Reps</span>
+      <div class="stepper"><button data-step="reps:-1" aria-label="Fewer reps">−</button><input id="d-reps" class="num" inputmode="numeric" value="${draft.reps}" aria-label="Reps"><button data-step="reps:1" aria-label="More reps">+</button></div></div>
+    <div class="field"><span class="eyebrow">Reps in reserve · target ${esc(target)}</span>
+      <div class="rir" role="radiogroup" aria-label="Reps in reserve">${[0,1,2,3,4].map(v=>`<button data-rir="${v}" aria-pressed="${draft.rir===v}" class="${rirMid(target)===v?"target":""}">${v===4?"4+":v}</button>`).join("")}</div></div>
+    <details><summary>Cues and elbow note</summary><p class="small"><b>Technique:</b> ${esc(ex.technique||"Straight sets")}</p><p class="small"><b>Cue:</b> ${esc(ex.cue||"–")}</p><p class="small"><b>Joint:</b> ${esc(ex.elbowNote||"–")}</p></details>
+    <details><summary>Swap, skip or note</summary><div class="row">
+      ${["Cable rope hammer curl","Single-arm cable pressdown","Machine chest press (neutral)","Cable fly"].concat(ex.alts||[]).filter((v,i,a)=>a.indexOf(v)===i).filter(n=>relevantAlt(ex,n)).map(n=>`<button class="btn sm" data-swap="${esc(n)}">Swap: ${esc(n)}</button>`).join("")}
+      ${le.swappedTo?`<button class="btn sm" data-swap="">Undo swap</button>`:""}
+      <button class="btn sm" id="l-skip">${le.skipped?"Unskip":"Skip exercise"}</button></div>
+      <div class="field"><label for="l-note">Note for this exercise</label><input id="l-note" value="${esc(le.note||"")}" placeholder="e.g. inner elbow 2/10"></div></details>
+  </section>
+  <div class="dock">
+    ${restEnd?timerHtml():""}
+    <button class="btn primary big" id="l-log">Log set ${nDone+1}</button>
+    <div class="grid2"><button class="btn" id="l-prev" ${exIdx===0?"disabled":""}>‹ Previous</button>${exIdx < s.exercises.length-1?`<button class="btn" id="l-next">Next exercise ›</button>`:`<button class="btn" id="l-finish">Finish session</button>`}</div>
+  </div>
+  ${exIdx === s.exercises.length-1 || allExercisesDone(s,w) ? finishCard() : ""}`;
+}
+const shortName = n => n.replace(/\(.*?\)/g,"").split(",")[0].trim().slice(0,26);
+const fmtRest = s => s >= 60 ? `${Math.floor(s/60)}:${pad(s%60)}` : `${s}s`;
+function relevantAlt(ex, n){
+  if((ex.alts||[]).includes(n)) return true; // an exercise's own swaps always show
+  if(ex.muscle==="biceps") return /curl/i.test(n);
+  if(ex.muscle==="triceps") return /press(down)?|extension/i.test(n) && !/chest/i.test(n);
+  if(ex.muscle==="chest") return /chest|fly/i.test(n);
+  return (ex.alts||[]).includes(n);
+}
+// Group helpers: members in session order, which still need sets, and the rest taken after a round.
+function groupMembers(s, ex){ return s.exercises.filter(e => e.group && e.group === ex.group); }
+function needsSets(e){ const L = cur.exercises[e.id]; return !L?.skipped && Object.keys(L?.sets||{}).length < setsFor(e, Math.max(1,cur.week||1), cur.readiness, cur.short); }
+function groupNext(s, ex){ const m = groupMembers(s, ex); return m.slice(m.indexOf(ex)+1).find(needsSets) || null; }
+function groupRest(s, ex){ return Math.max(...groupMembers(s, ex).map(e => e.restSec)); }
+// Finishers: build weeks only, full session only. Mini-sets are stored on the exercise as fin: [{load, reps}].
+function finActive(ex, w){ return !!ex.finisher && META.finisherWeeks.includes(w) && !cur.short; }
+function lastFinisher(exId, beforeDate){
+  const l = Object.values(data.logs).filter(l => l.date < beforeDate && (l.exercises?.[exId]?.fin||[]).length).sort((a,b)=>b.date.localeCompare(a.date))[0];
+  return l ? { date: l.date, fin: l.exercises[exId].fin } : null;
+}
+function finisherBlock(ex, le, sets, nDone, planned){
+  const fin = le.fin || [], prev = fin[fin.length-1], lastSet = sets[nDone], lf = lastFinisher(ex.id, cur.date);
+  const load = prev ? prev.load : lastSet ? lastSet.load : "", reps = prev ? prev.reps : "";
+  return `<div class="banner info"><p class="small"><b>Last-set finisher (build week):</b> ${esc(ex.finisher)}</p>
+    ${fin.map((f,k)=>`<div class="setrow"><span class="n">F${k+1}</span><b>${f.load}</b>&nbsp;lb × <b>${f.reps}</b><button class="x" data-fdel="${k}" aria-label="Delete finisher set ${k+1}">×</button></div>`).join("")}
+    ${nDone >= planned ? `<div class="grid3"><div class="field"><label for="f-load">Load (lb)</label><input id="f-load" inputmode="decimal" value="${load}"></div>
+      <div class="field"><label for="f-reps">Reps</label><input id="f-reps" inputmode="numeric" value="${reps}"></div>
+      <button class="btn" id="f-log" style="align-self:flex-end">Log F${fin.length+1}</button></div>
+      <button class="btn sm" id="f-done">${fin.length ? "Finisher done · continue" : "Skip finisher · continue"}</button>`
+      : `<p class="small muted">Log it after set ${planned}.</p>`}
+    ${lf ? `<span class="tag muted num">Last finisher: ${lf.fin.map(f=>`${f.load}×${f.reps}`).join(", ")} · ${esc(fmtDate(lf.date))}</span>` : ""}</div>`;
+}
+function allExercisesDone(s,w){ return s.exercises.every(e => { const L = cur.exercises[e.id]; return L?.skipped || Object.keys(L?.sets||{}).length >= setsFor(e,w,cur.readiness,cur.short); }); }
+function finishCard(){ return `<section class="card" id="finish"><h3>Finish</h3><div class="field"><label>How did it go? (1-5)</label><div class="rir">${[1,2,3,4,5].map(v=>`<button data-feel="${v}" aria-pressed="${cur.feeling===v}">${v}</button>`).join("")}</div></div>
+  <div class="field"><label for="l-snote">Session note</label><textarea id="l-snote" placeholder="Sleep, pumps, elbow, anything odd">${esc(cur.note||"")}</textarea></div><button class="btn primary" id="l-finish2">Finish and save</button></section>`; }
+const e1rm = st => st.load * (1 + (st.reps + (st.rir ?? 0)) / 30);
+function bestBefore(exId, beforeDate){ let b = 0; Object.values(data.logs).forEach(l => { if(l.date < beforeDate) Object.values(l.exercises?.[exId]?.sets||{}).forEach(st => { if(st.reps > 0) b = Math.max(b, e1rm(st)); }); }); return b; }
+function lastPerformance(exId, beforeDate){
+  const hist = Object.values(data.logs).filter(l => l.date < beforeDate && l.exercises?.[exId] && Object.keys(l.exercises[exId].sets||{}).length && l.phase !== "deload").sort((a,b)=>b.date.localeCompare(a.date));
+  if(!hist.length) return null; const l = hist[0], sets = l.exercises[exId].sets;
+  const arr = Object.entries(sets).map(([n,s])=>Object.assign({n:+n},s));
+  const best = arr.reduce((a,b)=> (e1rm(b) > e1rm(a) ? b : a));
+  return { date: l.date, sets, arr, best };
+}
+// Training partner's most recent working sets on the same exercise (any date, deloads excluded).
+function partnerLast(exId){
+  let found = null;
+  Object.values(data.partnerLogs).forEach(logs => Object.values(logs).forEach(l => {
+    const sets = l.exercises?.[exId]?.sets; if(!sets || !Object.keys(sets).length || l.phase === "deload") return;
+    if(found && found.date >= l.date) return;
+    const arr = Object.values(sets); found = { date: l.date, best: arr.reduce((a,b)=> (e1rm(b) > e1rm(a) ? b : a)) };
+  }));
+  return found;
+}
+function progressionHint(ex, last){
+  if(!last || !ex.incr) return null;
+  const ok = last.arr.length >= Math.max(1, ex.sets-1) && last.arr.every(s => s.reps >= ex.repHi);
+  return ok ? +(Math.max(...last.arr.map(s=>s.load)) + ex.incr).toFixed(1) : null;
+}
+function prefill(ex, sets, last, target, n){
+  const prevThis = sets[n-1];
+  if(prevThis) return { ex: ex.id, n, load: prevThis.load, reps: prevThis.reps, rir: rirMid(target) };
+  if(last){ const s = last.sets[n] || last.arr[last.arr.length-1]; return { ex: ex.id, n, load: s.load, reps: s.reps, rir: rirMid(target) }; }
+  return { ex: ex.id, n, load: 0, reps: ex.repHi, rir: rirMid(target) };
+}
+function timerHtml(){ const left = Math.max(0, Math.round((restEnd - Date.now())/1000)); const pct = restTotal ? Math.max(0, Math.min(100, 100*(1 - left/restTotal))) : 100;
+  return `<div class="timer ${left===0?"zero":""}" id="timer" role="timer" aria-label="Rest timer"><span class="t" id="timer-t">${Math.floor(left/60)}:${pad(left%60)}</span><span class="grow small muted">${left===0?"Rest done. Go.":"Rest"}</span><button class="btn sm" id="t-plus">+15 s</button><button class="btn sm" id="t-skip">Skip</button><span class="bar" id="timer-bar" style="width:${pct}%"></span></div>`; }
+function tick(){
+  const el = $("#timer-t"); if(!restEnd){ clearInterval(timerHandle); timerHandle=null; return; }
+  const left = Math.max(0, Math.round((restEnd - Date.now())/1000));
+  if(el){ el.textContent = `${Math.floor(left/60)}:${pad(left%60)}`; const b = $("#timer-bar"); if(b) b.style.width = (restTotal?Math.max(0,Math.min(100,100*(1-left/restTotal))):100)+"%";
+    if(left===0 && !$("#timer").classList.contains("zero")){ $("#timer").classList.add("zero"); beep(); } }
+}
+let audioCtx = null;
+function beep(){ try{ if(!audioCtx) return; const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.frequency.value = 880; g.gain.value = .08; o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+.25); }catch(e){} }
+function startRest(sec){ restTotal = sec; restEnd = Date.now() + sec*1000; if(!timerHandle) timerHandle = setInterval(tick, 250); try{ if(!audioCtx){ const A = window.AudioContext||window.webkitAudioContext; if(A) audioCtx = new A(); } audioCtx && audioCtx.resume && audioCtx.resume(); }catch(e){} }
+document.addEventListener("visibilitychange", async () => { if(document.visibilityState==="visible"){ tick(); if(activeId && navigator.wakeLock && !wakeLock?.released===false){ try{ wakeLock = await navigator.wakeLock.request("screen"); }catch(e){} } } });
+
+function bindLog(){
+  document.querySelectorAll("[data-start]").forEach(b => b.onclick = () => openStart(b.dataset.start));
+  document.querySelectorAll("[data-resume]").forEach(b => b.onclick = () => { activeId = b.dataset.resume; cur = JSON.parse(JSON.stringify(data.logs[activeId])); render(); });
+  if(!cur) return;
+  const s = Object.assign({}, SESS[cur.sessionId]); s.exercises = sessExercises(SESS[cur.sessionId], cur); const w = Math.max(1, cur.week||1), ex = s.exercises[exIdx];
+  const L = () => (cur.exercises[ex.id] = cur.exercises[ex.id] || { name: ex.name, muscle: ex.muscle, sets: {} });
+  $("#l-back").onclick = () => { tab = "today"; render(); };
+  document.querySelectorAll("[data-ex]").forEach(b => b.onclick = () => { exIdx = +b.dataset.ex; draft = null; render(); });
+  document.querySelectorAll("[data-step]").forEach(b => {
+    const go = () => { const [k,d] = b.dataset.step.split(":"); readDraftInputs(); const step = k==="load" ? (ex.incr||1) : 1;
+      draft[k] = Math.max(0, +(draft[k] + (+d)*step).toFixed(2)); const i = $(k==="load"?"#d-load":"#d-reps"); if(i) i.value = draft[k]; };
+    let hold = null; b.onclick = go;
+    b.onpointerdown = () => { hold = setTimeout(function rep(){ go(); hold = setTimeout(rep, 110); }, 450); };
+    ["pointerup","pointerleave","pointercancel"].forEach(ev => b.addEventListener(ev, () => clearTimeout(hold)));
+  });
+  document.querySelectorAll("[data-rir]").forEach(b => b.onclick = () => { readDraftInputs(); draft.rir = +b.dataset.rir; document.querySelectorAll("[data-rir]").forEach(x => x.setAttribute("aria-pressed", String(+x.dataset.rir===draft.rir))); });
+  $("#l-log").onclick = () => {
+    readDraftInputs(); if(!(draft.reps > 0)){ toast("Enter reps first."); return; }
+    const le = L(), n = Object.keys(le.sets).length + 1;
+    le.sets[n] = { load: draft.load, reps: draft.reps, rir: draft.rir, t: Date.now() };
+    const hist = bestBefore(ex.id, cur.date), here = Math.max(0, ...Object.entries(le.sets).filter(([k]) => +k !== n).map(([,v]) => e1rm(v)));
+    if(hist > 0 && e1rm(le.sets[n]) > Math.max(hist, here)) le.sets[n].pr = true;
+    const prTxt = le.sets[n].pr ? " · PR!" : "";
+    persistCur();
+    const planned = setsFor(ex, w, cur.readiness, cur.short);
+    if(n === planned && finActive(ex, w) && !(le.fin||[]).length){ restEnd = 0; toast(`Set ${n} logged${prTxt} · finisher next`); draft = null; render(); return; }
+    if(ex.group){
+      const nx = groupNext(s, ex);
+      if(nx){ restEnd = 0; toast(`Set ${n} logged${prTxt} · now ${groupLabels(s.exercises)[nx.id]}`); exIdx = s.exercises.indexOf(nx); draft = null; render(); return; }
+      startRest(groupRest(s, ex));
+      const first = groupMembers(s, ex).find(needsSets); const after = s.exercises.indexOf(groupMembers(s, ex).slice(-1)[0]) + 1;
+      const exId = ex.id; toast(`Set ${n} logged${prTxt} · rest`, { label: "Undo", fn: () => { if(!cur || !cur.exercises[exId]) return; delete cur.exercises[exId].sets[n]; persistCur(); restEnd = 0; draft = null; render(); } });
+      exIdx = first ? s.exercises.indexOf(first) : Math.min(after, s.exercises.length-1); draft = null; render(); return;
+    }
+    startRest(ex.restSec);
+    const exId = ex.id; toast(`Set ${n} logged${prTxt}`, { label: "Undo", fn: () => { if(!cur || !cur.exercises[exId]) return; delete cur.exercises[exId].sets[n]; persistCur(); restEnd = 0; draft = null; render(); } });
+    if(n >= planned && exIdx < s.exercises.length-1){ setTimeout(() => { exIdx++; draft = null; render(); }, 400); }
+    draft = null; render();
+  };
+  document.querySelectorAll("[data-del]").forEach(b => b.onclick = () => { const le = L(), n = b.dataset.del; const kept = Object.entries(le.sets).filter(([k])=>k!==n).sort((a,b)=>a[0]-b[0]).map(([,v])=>v);
+    le.sets = Object.fromEntries(kept.map((v,i)=>[String(i+1),v])); persistCur(); draft = null; render(); });
+  document.querySelectorAll("[data-swap]").forEach(b => b.onclick = () => { const le = L(); le.swappedTo = b.dataset.swap || null; persistCur(); render(); });
+  $("#l-skip").onclick = () => { const le = L(); le.skipped = !le.skipped; persistCur(); if(le.skipped && exIdx < s.exercises.length-1){ exIdx++; draft = null; } render(); };
+  const note = $("#l-note"); if(note) note.onchange = () => { L().note = note.value; persistCur(); };
+  $("#l-prev").onclick = () => { exIdx = Math.max(0, exIdx-1); draft = null; render(); };
+  const nx = $("#l-next"); if(nx) nx.onclick = () => { exIdx++; draft = null; render(); };
+  const fl = $("#f-log"); if(fl) fl.onclick = () => { const load = num($("#f-load").value), reps = num($("#f-reps").value);
+    if(!(reps > 0)){ toast("Enter finisher reps first."); return; } const le = L(); le.fin = (le.fin||[]).concat([{ load: load ?? 0, reps: Math.round(reps), t: Date.now() }]); persistCur(); toast(`F${le.fin.length} logged`); render(); };
+  document.querySelectorAll("[data-fdel]").forEach(b => b.onclick = () => { const le = L(); le.fin = (le.fin||[]).filter((_,k) => k !== +b.dataset.fdel); persistCur(); render(); });
+  const fd = $("#f-done"); if(fd) fd.onclick = () => {
+    if(ex.group){ const nxt = groupNext(s, ex); if(nxt){ exIdx = s.exercises.indexOf(nxt); draft = null; render(); return; }
+      startRest(groupRest(s, ex)); const m = groupMembers(s, ex), first = m.find(needsSets); exIdx = first ? s.exercises.indexOf(first) : Math.min(s.exercises.indexOf(m[m.length-1]) + 1, s.exercises.length-1); }
+    else { startRest(ex.restSec); if(exIdx < s.exercises.length-1) exIdx++; }
+    draft = null; render(); };
+  const f1 = $("#l-finish"); if(f1) f1.onclick = () => $("#finish")?.scrollIntoView({behavior:"smooth"});
+  document.querySelectorAll("[data-feel]").forEach(b => b.onclick = () => { cur.feeling = +b.dataset.feel; document.querySelectorAll("[data-feel]").forEach(x=>x.setAttribute("aria-pressed", String(+x.dataset.feel===cur.feeling))); });
+  const f2 = $("#l-finish2"); if(f2) f2.onclick = async () => { cur.note = $("#l-snote").value; cur.finishedAt = Date.now(); restEnd = 0; await persistCur();
+    try{ wakeLock && wakeLock.release(); }catch(e){} toast("Session saved"); activeId = null; cur = null; exIdx = 0; tab = "today"; render(); scrollTo(0,0); };
+  if(restEnd){ $("#t-plus").onclick = () => { restEnd += 15000; restTotal += 15; tick(); }; $("#t-skip").onclick = () => { restEnd = 0; render(); }; if(!timerHandle) timerHandle = setInterval(tick, 250); }
+}
+function readDraftInputs(){ const l = num($("#d-load")?.value), r = num($("#d-reps")?.value); if(l != null) draft.load = l; if(r != null) draft.reps = Math.round(r); }
+
+// ---------- PROGRESS ----------
+function viewProgress(){
+  const curW = Math.max(1, Math.min(16, weekOf(todayIso()))), pw = progWeek || curW;
+  const sets = setsByMuscle(pw), tg = targetsFor(pw);
+  return `<header><p class="eyebrow">Progress</p><h1>Week ${curW} of 16</h1></header>
+  <section class="card"><div class="row between"><h3>Sets by muscle · week ${pw}</h3><div class="row"><button class="btn sm" id="p-prev" ${pw<=1?"disabled":""} aria-label="Previous week">‹</button><button class="btn sm" id="p-next" ${pw>=16?"disabled":""} aria-label="Next week">›</button></div></div>
+    <p class="small muted">Effective hard sets: presses count ½ to triceps, rows and pulldowns ½ to biceps. Arms: 12 direct sets ≈ 19 effective. ${modeFor(pw)==="fallback"?"Fallback targets.":weekPlan(pw).setsMult!==1?`Targets scaled ×${weekPlan(pw).setsMult} for this week.`:""}</p>
+    <div class="bars">${MUSCLE_KEYS.map(m => { const v = sets[m], t = tg[m], max = Math.max(t.hi*1.25, v, 1);
+      const st = v < t.lo ? ["Under","s-warn"] : v > t.hi ? ["Over","s-info"] : ["In range","s-ok"];
+      return `<div class="mbar"><span>${esc(META.muscles[m].label)}</span><span class="track"><span class="fill" style="width:${100*v/max}%"></span><span class="tick" style="left:${100*t.lo/max}%"></span><span class="tick" style="left:${100*t.hi/max}%"></span></span><span class="val">${+v.toFixed(1)} / ${t.lo}-${t.hi} <span class="status ${st[1]}" style="font-size:11px">${st[0]}</span></span></div>`; }).join("")}</div></section>
+  ${keyLiftCard(curW)}`;
+}
+function bestE1(exId, wks){ let best = 0; Object.values(data.logs).filter(l => wks.includes(l.week)).forEach(l => Object.values(l.exercises?.[exId]?.sets||{}).forEach(st => { if(st.reps>0) best = Math.max(best, e1rm(st)); })); return best || null; }
+// Weekly best e1RM for one key lift, weeks 1-16: a single series, so no legend; the row label names it.
+function keySpark(id){
+  const W = 170, H = 40, P = 5, pts = WEEKS.map(wp => [wp.week, bestE1(id, [wp.week])]).filter(([,v]) => v);
+  const name = esc(EXBYID[id].name.split(",")[0]);
+  if(pts.length < 2) return `<div class="spark"><span>${name}</span><span class="small muted">Trend after 2 weeks</span></div>`;
+  const lo = Math.min(...pts.map(p=>p[1])), hi = Math.max(...pts.map(p=>p[1])), span = (hi - lo) || 1;
+  const x = w => P + (w-1)*(W-2*P)/15, y = v => H - P - (v - lo)*(H-2*P)/span;
+  const line = pts.map(([w,v]) => `${x(w).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  return `<div class="spark"><span>${name} <span class="muted small num">${Math.round(pts[pts.length-1][1])}</span></span>
+    <svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${name}: weekly best estimated 1RM, ${pts.map(([w,v])=>`week ${w} ${Math.round(v)}`).join(", ")}">
+    <polyline points="${line}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${pts.map(([w,v]) => `<circle cx="${x(w).toFixed(1)}" cy="${y(v).toFixed(1)}" r="4" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"><title>Week ${w}: ${Math.round(v)} lb e1RM</title></circle>`).join("")}</svg></div>`;
+}
+function keyLiftCard(curW){
+  const rows = META.keyLifts.map(id => { const bench = bestE1(id,[3,4]); let latest = null, lw = null;
+    for(let w = curW; w >= 5 && !latest; w--){ if(weekPlan(w).phase === "deload") continue; latest = bestE1(id,[w]); lw = w; }
+    const pct = bench && latest ? latest/bench : null;
+    const st = pct==null ? ["–",""] : pct >= .97 ? ["Holding","s-ok"] : pct >= .93 ? ["Amber","s-warn"] : ["Red","s-danger"];
+    return `<tr><td>${esc(EXBYID[id].name.split(",")[0])}</td><td class="num">${bench?Math.round(bench):"–"}</td><td class="num">${latest?Math.round(latest)+` <span class="muted small">wk ${lw}</span>`:"–"}</td><td><span class="status ${st[1]}">${pct?Math.round(pct*100)+"% ":""}${st[0]}</span></td></tr>`; });
+  const reds = rows.filter(r => r.includes(">Red<")).length;
+  return `<section class="card"><h3>Key lifts</h3><p class="small muted">Estimated 1RM including reps in reserve. Benchmark = best of weeks 3-4. Holding ≥ 97%, amber 93-97%, red &lt; 93%.</p>
+    <div class="tablewrap"><table><thead><tr><th>Lift</th><th>Wk 3-4</th><th>Latest</th><th>Status</th></tr></thead><tbody>${rows.join("")}</tbody></table></div>
+    <div>${META.keyLifts.map(id => keySpark(id)).join("")}</div>
+    ${reds>=2?`<div class="banner danger"><p class="small"><b>Red flag:</b> 2+ key lifts under 93%. Take an early deload: half sets, 4+ RIR, 5-7 days.</p></div>`:""}</section>`;
+}
+function bindProgress(){
+  const p = $("#p-prev"), n = $("#p-next"), cw = Math.max(1, Math.min(16, weekOf(todayIso())));
+  if(p) p.onclick = () => { progWeek = Math.max(1, (progWeek||cw)-1); render(); };
+  if(n) n.onclick = () => { progWeek = Math.min(16, (progWeek||cw)+1); render(); };
+}
+
+// ---------- PLAN ----------
+function viewPlan(){
+  const segs = [["weeks","Weeks"],["sessions","Sessions"],["rules","Rules"],["evidence","Evidence"],["settings","Settings"]];
+  const body = { weeks: planWeeks, sessions: planSessions, rules: planRules, evidence: planEvidence, settings: planSettings }[planSeg]();
+  return `<header><p class="eyebrow">Plan</p><h1>16-week cut</h1><p class="muted small">Start ${esc(fmtDate(META.startDate))} · 6 sessions a week · 3-day fallback</p></header>
+  <div class="seg" role="group" aria-label="Plan sections">${segs.map(([k,l])=>`<button data-seg="${k}" aria-pressed="${planSeg===k}">${l}</button>`).join("")}</div>${body}`;
+}
+function planWeeks(){
+  const cw = weekOf(todayIso());
+  return `<section class="card"><div class="tablewrap"><table><thead><tr><th>Wk</th><th>Phase</th><th>Vol</th><th>RIR c / i</th><th>Mode</th></tr></thead><tbody>${WEEKS.map(wp=>`<tr ${wp.week===cw?'style="background:var(--surface-2)"':""}><td class="num"><b>${wp.week}</b></td><td>${esc(wp.label)}</td><td class="num">×${wp.setsMult}</td><td class="num">${esc(wp.rirCompound)} / ${esc(wp.rirIsolation)}</td>
+    <td><button class="btn sm" data-mode="${wp.week}">${modeFor(wp.week)==="fallback"?"Fallback":"Full"}</button></td></tr>`).join("")}</tbody></table></div>
+    <p class="small muted">Vol scales every exercise's sets. RIR: compounds / isolation; elbow-crossing isolation gets +1. Tap Full/Fallback to switch a week.</p></section>`;
+}
+function planSessions(){
+  return PLAN.sessions.map(s => `<section class="card"><div class="row between"><h3>${esc(s.id)} · ${esc(s.title)}</h3><span class="muted small">${s.day.toUpperCase()} · ~${estMin(s)} min</span></div>
+    <div class="tablewrap"><table><thead><tr><th>Exercise</th><th>Sets × reps</th><th>Rest</th></tr></thead><tbody>${(GL => s.exercises.map(e=>{ const alt = (e.variants||[])[1]; return `<tr><td>${GL[e.id]?`<b>${GL[e.id]}</b> `:""}${esc(e.name)}${e.technique?`<br><span class="small">${esc(e.technique)}${e.techniqueB&&e.techniqueB!==e.technique?` · <b>wks 5-8, 13-16:</b> ${esc(e.techniqueB)}`:""}</span>`:""}${alt?`<br><span class="small"><b>${e.rotate==="week"?"Even weeks":"Weeks 5-8, 13-16"}:</b> ${esc(alt.name)}</span>`:""}${e.finisher?`<br><span class="small s-info">Finisher, build weeks: ${esc(e.finisher)}</span>`:""}${e.elbowNote?`<br><span class="small muted">${esc(e.elbowNote)}</span>`:""}</td><td class="num">${e.sets} × ${e.repLo}-${e.repHi}${e.perSide?"/leg":""}</td><td class="num">${fmtRest(e.restSec)}</td></tr>`; }).join(""))(groupLabels(s.exercises))}</tbody></table></div></section>`).join("");
+}
+function planRules(){
+  const R = META.rules, sec = (t, a) => `<section class="card"><h3>${t}</h3><ul class="rules">${a.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></section>`;
+  return `<section class="card" style="border-color:var(--danger)"><h3>Stop and get care</h3><ul class="rules">${R.safety.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></section>` + sec("Advanced work", R.advanced) + sec("Short on time", R.trim) + sec("Switch to the 3-day fallback when", R.fallbackEnter) + sec("Return to the full week", R.fallbackExit)
+    + sec("Progression and red flags", R.progression) + sec("Golfer's elbow", R.elbow)
+    + sec("Cardio", R.cardio)
+    + `<section class="card"><p class="small muted">This plan was built by an AI panel from published research. It is not medical advice. Check bloodwork, a new pain, or anything that worries you with your physician.</p></section>`;
+}
+function planEvidence(){
+  return `<section class="card"><p class="small muted">Each claim the plan leans on, with its source. <b>Verified</b> = the paper was found and the claim matches its abstract. <b>Not trial-tested</b> = panel judgment or coaching practice.</p>${PLAN.evidence.map(e=>`<div class="ev"><div class="row between"><b>${esc(e.topic)}</b><span class="tag ${e.verified?"s-ok":"s-warn"}">${e.verified?"Verified":"Not trial-tested"}</span></div><p class="small">${esc(e.claim)}</p><p class="small muted">${esc(e.source)}</p>${e.url?`<a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.url.replace(/^https?:\/\//,""))}</a>`:""}</div>`).join("")}</section>`;
+}
+function planSettings(){
+  const th = document.documentElement.dataset.theme || "system";
+  return `<section class="card"><h3>Theme</h3><div class="seg">${["system","light","dark"].map(t=>`<button data-theme-set="${t}" aria-pressed="${th===t}">${t[0].toUpperCase()+t.slice(1)}</button>`).join("")}</div></section>
+  <section class="card"><h3>Export for your Mac</h3><p class="small muted">Two CSV files that open in Excel: every logged set and weekly sets by muscle.</p>${dl?`<button class="btn" id="s-export">Export CSVs</button>`:`<p class="small muted">Export isn't available in this view.</p>`}</section>
+  <section class="card"><h3>Add to your iPhone</h3><p class="small">In Safari, tap Share, then <b>Add to Home Screen</b>. It opens like an app.</p></section>`;
+}
+function bindPlan(){
+  document.querySelectorAll("[data-seg]").forEach(b => b.onclick = () => { planSeg = b.dataset.seg; render(); });
+  document.querySelectorAll("[data-mode]").forEach(b => b.onclick = () => { const w = +b.dataset.mode, m = Object.assign({}, appState().weekMode); if(modeFor(w)==="fallback") delete m[wk(w)]; else m[wk(w)] = "fallback"; saveApp({weekMode:m}); });
+  document.querySelectorAll("[data-theme-set]").forEach(b => b.onclick = () => { const t = b.dataset.themeSet; if(t==="system") delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = t; try{ t==="system"?localStorage.removeItem("v9-theme"):localStorage.setItem("v9-theme", t); }catch(e){} render(); });
+  const ex = $("#s-export"); if(ex) ex.onclick = exportCsv;
+}
+const csv = rows => "﻿" + rows.map(r => r.map(v => { const s = v==null ? "" : String(v); return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s; }).join(",")).join("\n");
+async function exportCsv(){
+  const d = todayIso(), logs = Object.values(data.logs).sort((a,b)=>a.date.localeCompare(b.date));
+  const sets = [["date","week","phase","mode","session","exercise_id","exercise","muscle","set","load_lb","reps","rir","e1rm"]];
+  logs.forEach(l => Object.entries(l.exercises||{}).forEach(([id,e]) => { Object.entries(e.sets||{}).forEach(([n,s]) => sets.push([l.date,l.week,l.phase,l.mode,l.sessionId,id,e.swappedTo||e.name,e.muscle,n,s.load,s.reps,s.rir,Math.round(e1rm(s))]));
+    (e.fin||[]).forEach((f,k) => sets.push([l.date,l.week,l.phase,l.mode,l.sessionId,id,e.swappedTo||e.name,e.muscle,"F"+(k+1),f.load,f.reps,"",""])); }));
+  const weeks = [["week","phase","mode"].concat(MUSCLE_KEYS.map(m=>m+"_sets"))];
+  for(let w=1; w<=16; w++){ const s = setsByMuscle(w); weeks.push([w, WEEKS[w-1].phase, modeFor(w)].concat(MUSCLE_KEYS.map(m=>+s[m].toFixed(1)))); }
+  for(const [name, rows] of [[`v9_sets_${d}.csv`, sets], [`v9_weekly_${d}.csv`, weeks]]){
+    try{ await dl.save({ filename: name, data: csv(rows) }); }
+    catch(e){ if(e?.code === "declined") continue; toast(e?.code === "rate_limited" ? "Too many downloads at once. Try again in a minute." : "Export didn't finish. Try again."); return; }
+  }
+  toast("Export done");
+}
+
+ready = connect(); render();
+})();
+</script>
+
+</body></html>
